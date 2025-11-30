@@ -35,7 +35,18 @@ export default function Admin() {
       };
 
       // Envia para o Backend
-      await axios.post('http://localhost:8080/products', payload);
+// 1. Recupera o token do navegador
+      const token = localStorage.getItem('miniecommerce_token');
+
+      // 2. Prepara o cabeçalho de autorização
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      };
+
+      // 3. Envia para o Backend COM O TOKEN
+      await axios.post('http://localhost:8080/products', payload, config);
       
       alert('Produto cadastrado com sucesso!');
       

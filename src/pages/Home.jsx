@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, LogIn, Search, Menu, X, Loader, ExternalLink } from 'lucide-react';
 import axios from 'axios';
+import { Link } from 'react-router-dom'; // <--- Adicione se não tiver
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -50,8 +51,11 @@ export default function Home() {
               </button>
               
               <button className="flex items-center space-x-2 bg-pink-600 text-white px-4 py-2 rounded-full hover:bg-pink-700 transition">
-                <LogIn className="h-4 w-4" />
-                <span>Login</span>
+                {/* Botão de Login que funciona */}
+                <Link to="/login" className="flex items-center space-x-2 bg-pink-600 text-white px-4 py-2 rounded-full hover:bg-pink-700 transition">
+                  <LogIn className="h-4 w-4" />
+                  <span>Login</span>
+                </Link>
               </button>
             </div>
             
