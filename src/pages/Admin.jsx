@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { ArrowLeft, Save, Trash2, Edit, XCircle, Star } from 'lucide-react';
+// AQUI ESTAVA O ERRO: Faltava importar o 'Tag'
+import { ArrowLeft, Save, Trash2, Edit, XCircle, Star, Tag } from 'lucide-react';
 
 export default function Admin() {
   const [products, setProducts] = useState([]);
@@ -16,7 +17,7 @@ export default function Admin() {
     affiliateUrl: '',
     type: 'PHYSICAL',
     categoryId: '',
-    isFeatured: false // ESTADO DO DESTAQUE
+    isFeatured: false 
   });
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export default function Admin() {
       affiliateUrl: product.affiliateUrl || '',
       type: product.type,
       categoryId: firstCatId,
-      isFeatured: product.isFeatured || false // CARREGA SE É DESTAQUE
+      isFeatured: product.isFeatured || false
     });
     setEditingId(product.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -81,7 +82,6 @@ export default function Admin() {
     const { name, value, type, checked } = e.target;
     setFormData(prevState => ({
       ...prevState,
-      // LÓGICA DO CHECKBOX: SE FOR 'checkbox', USA O CHECKED, SENÃO USA VALUE
       [name]: type === 'checkbox' ? checked : value
     }));
   };
@@ -119,11 +119,19 @@ export default function Admin() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         
-        <div className="flex items-center gap-4 mb-8">
-          <Link to="/" className="p-2 bg-white rounded-full shadow hover:bg-gray-100 text-gray-600">
-            <ArrowLeft size={20} />
+        {/* CABEÇALHO DO ADMIN */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-4">
+            <Link to="/" className="p-2 bg-white rounded-full shadow hover:bg-gray-100 text-gray-600">
+              <ArrowLeft size={20} />
+            </Link>
+            <h1 className="text-3xl font-bold text-gray-800">Painel Administrativo</h1>
+          </div>
+
+          {/* BOTÃO PARA GERENCIAR CATEGORIAS */}
+          <Link to="/admin/categories" className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm font-bold flex items-center justify-center gap-2 shadow-md">
+            <Tag size={16} /> Gerenciar Categorias
           </Link>
-          <h1 className="text-3xl font-bold text-gray-800">Painel Administrativo</h1>
         </div>
 
         {/* --- FORMULÁRIO --- */}
@@ -150,7 +158,7 @@ export default function Admin() {
               <textarea name="description" value={formData.description} onChange={handleChange} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none h-24" />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Preço (R$)</label>
                 <input type="number" name="price" value={formData.price} onChange={handleChange} step="0.01" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none" required />
@@ -181,7 +189,6 @@ export default function Admin() {
               <input type="text" name="imgUrl" value={formData.imgUrl} onChange={handleChange} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none" />
             </div>
 
-            {/* --- CHECKBOX DE DESTAQUE (NOVO) --- */}
             <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <input 
                 type="checkbox" 
@@ -196,7 +203,6 @@ export default function Admin() {
                 Destacar este produto no Carrossel da Home
               </label>
             </div>
-            {/* ----------------------------------- */}
 
             {formData.type === 'AFFILIATE' && (
               <div className="bg-pink-50 p-4 rounded-lg border border-pink-100">
@@ -225,7 +231,7 @@ export default function Admin() {
                   <th className="py-3">Img</th>
                   <th className="py-3">Nome</th>
                   <th className="py-3">Preço</th>
-                  <th className="py-3">Destaque?</th> {/* Nova Coluna */}
+                  <th className="py-3">Destaque?</th>
                   <th className="py-3 text-right">Ações</th>
                 </tr>
               </thead>
