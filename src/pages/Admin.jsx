@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { ArrowLeft, Save, Trash2, Edit, XCircle } from 'lucide-react'; // Adicionei Edit e XCircle
+import { ArrowLeft, Save, Trash2, Edit, XCircle, Star } from 'lucide-react';
 
 export default function Admin() {
   const [products, setProducts] = useState([]);
-  const [editingId, setEditingId] = useState(null); // NOVO: Guarda o ID de quem estamos editando
+  const [categories, setCategories] = useState([]);
+  const [editingId, setEditingId] = useState(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -13,11 +14,14 @@ export default function Admin() {
     price: '',
     imgUrl: '',
     affiliateUrl: '',
-    type: 'PHYSICAL'
+    type: 'PHYSICAL',
+    categoryId: '',
+    isFeatured: false // ESTADO DO DESTAQUE
   });
 
   useEffect(() => {
     loadProducts();
+    loadCategories();
   }, []);
 
   const loadProducts = async () => {
@@ -29,28 +33,35 @@ export default function Admin() {
     }
   };
 
-  // --- AÇÃO DE CLICAR NO LÁPIS ---
+  const loadCategories = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/categories');
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Erro ao carregar categorias:", error);
+    }
+  };
+
   const handleEdit = (product) => {
-    // 1. Preenche o formulário com os dados do produto clicado
+    const firstCatId = product.categories && product.categories.length > 0 ? product.categories[0].id : '';
+
     setFormData({
       name: product.name,
       description: product.description,
       price: product.price,
       imgUrl: product.imgUrl,
-      affiliateUrl: product.affiliateUrl || '', // Garante que não seja null
-      type: product.type
+      affiliateUrl: product.affiliateUrl || '',
+      type: product.type,
+      categoryId: firstCatId,
+      isFeatured: product.isFeatured || false // CARREGA SE É DESTAQUE
     });
-    // 2. Marca que estamos editando este ID
     setEditingId(product.id);
-    
-    // 3. Rola a tela para o topo para ver o formulário
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // --- AÇÃO DE CANCELAR EDIÇÃO ---
   const cancelEdit = () => {
     setEditingId(null);
-    setFormData({ name: '', description: '', price: '', imgUrl: '', affiliateUrl: '', type: 'PHYSICAL' });
+    setFormData({ name: '', description: '', price: '', imgUrl: '', affiliateUrl: '', type: 'PHYSICAL', categoryId: '', isFeatured: false });
   };
 
   const handleDelete = async (id) => {
@@ -67,35 +78,40 @@ export default function Admin() {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevState => ({ ...prevState, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      // LÓGICA DO CHECKBOX: SE FOR 'checkbox', USA O CHECKED, SENÃO USA VALUE
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
-  // --- O CORAÇÃO DA LÓGICA (CRIAR OU ATUALIZAR) ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('miniecommerce_token');
       const config = { headers: { 'Authorization': `Bearer ${token}` } };
-      const payload = { ...formData, price: parseFloat(formData.price) };
+      
+      const payload = { 
+        ...formData, 
+        price: parseFloat(formData.price),
+        categories: formData.categoryId ? [{ id: formData.categoryId }] : []
+      };
 
       if (editingId) {
-        // --- MODO EDIÇÃO (PUT) ---
         await axios.put(`http://localhost:8080/products/${editingId}`, payload, config);
         alert('Produto atualizado com sucesso!');
       } else {
-        // --- MODO CRIAÇÃO (POST) ---
         await axios.post('http://localhost:8080/products', payload, config);
         alert('Produto cadastrado com sucesso!');
       }
       
-      // Limpa tudo e recarrega
       cancelEdit();
       loadProducts();
 
     } catch (error) {
       console.error("Erro:", error);
-      alert('Erro ao salvar. Verifique o console.');
+      alert('Erro ao salvar.');
     }
   };
 
@@ -134,11 +150,12 @@ export default function Admin() {
               <textarea name="description" value={formData.description} onChange={handleChange} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none h-24" />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Preço (R$)</label>
                 <input type="number" name="price" value={formData.price} onChange={handleChange} step="0.01" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none" required />
               </div>
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
                 <select name="type" value={formData.type} onChange={handleChange} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none bg-white">
@@ -147,12 +164,39 @@ export default function Admin() {
                   <option value="DIGITAL">Digital</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                <select name="categoryId" value={formData.categoryId} onChange={handleChange} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none bg-white" required>
+                  <option value="">Selecione...</option>
+                  {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">URL da Imagem</label>
               <input type="text" name="imgUrl" value={formData.imgUrl} onChange={handleChange} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none" />
             </div>
+
+            {/* --- CHECKBOX DE DESTAQUE (NOVO) --- */}
+            <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <input 
+                type="checkbox" 
+                name="isFeatured" 
+                id="isFeatured"
+                checked={formData.isFeatured} 
+                onChange={handleChange}
+                className="w-5 h-5 text-pink-600 rounded focus:ring-pink-500 cursor-pointer accent-pink-600"
+              />
+              <label htmlFor="isFeatured" className="text-gray-700 font-bold cursor-pointer select-none flex items-center gap-2">
+                <Star size={18} className="text-yellow-500 fill-yellow-500"/>
+                Destacar este produto no Carrossel da Home
+              </label>
+            </div>
+            {/* ----------------------------------- */}
 
             {formData.type === 'AFFILIATE' && (
               <div className="bg-pink-50 p-4 rounded-lg border border-pink-100">
@@ -178,10 +222,10 @@ export default function Admin() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="text-gray-500 border-b">
-                  <th className="py-3">Imagem</th>
+                  <th className="py-3">Img</th>
                   <th className="py-3">Nome</th>
                   <th className="py-3">Preço</th>
-                  <th className="py-3">Tipo</th>
+                  <th className="py-3">Destaque?</th> {/* Nova Coluna */}
                   <th className="py-3 text-right">Ações</th>
                 </tr>
               </thead>
@@ -192,28 +236,11 @@ export default function Admin() {
                     <td className="py-3 font-medium">{product.name}</td>
                     <td className="py-3">R$ {product.price?.toFixed(2)}</td>
                     <td className="py-3">
-                        <span className={`px-2 py-1 rounded text-xs font-bold ${product.type === 'AFFILIATE' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'}`}>
-                            {product.type}
-                        </span>
+                        {product.isFeatured && <Star size={16} className="text-yellow-500 fill-yellow-500" />}
                     </td>
                     <td className="py-3 text-right flex justify-end gap-2">
-                      {/* BOTÃO EDITAR (NOVO) */}
-                      <button 
-                        onClick={() => handleEdit(product)} 
-                        className="p-2 text-blue-500 hover:bg-blue-50 rounded-full transition"
-                        title="Editar"
-                      >
-                        <Edit size={18} />
-                      </button>
-
-                      {/* BOTÃO DELETAR */}
-                      <button 
-                        onClick={() => handleDelete(product.id)}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-full transition"
-                        title="Excluir"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      <button onClick={() => handleEdit(product)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-full transition"><Edit size={18} /></button>
+                      <button onClick={() => handleDelete(product.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition"><Trash2 size={18} /></button>
                     </td>
                   </tr>
                 ))}
