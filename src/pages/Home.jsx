@@ -108,11 +108,14 @@ export default function Home() {
 products.map((product) => (
                 <div key={product.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition hover:-translate-y-1 flex flex-col h-full">
                   <div className="relative">
+                    <Link to={`/product/${product.id}`}>
                     <img 
-                      className="w-full h-48 object-cover" 
+                      className="w-full h-48 object-cover cursor-pointer"
                       src={product.imgUrl ? product.imgUrl : "https://via.placeholder.com/300x200?text=Sem+Imagem"}
                       alt={product.name}
+                      title="Clique para ver detalhes"
                     />
+                    </Link>
                   </div>
                   
                   <div className="p-5 flex flex-col flex-grow">
