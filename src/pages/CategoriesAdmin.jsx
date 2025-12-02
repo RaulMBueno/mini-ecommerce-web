@@ -27,11 +27,8 @@ export default function CategoriesAdmin() {
     if (!newCategoryName.trim()) return;
 
     try {
-      const token = localStorage.getItem('miniecommerce_token');
-      const config = { headers: { 'Authorization': `Bearer ${token}` } };
-      
-      // CORREÇÃO: api.post
-      await api.post('/categories', { name: newCategoryName }, config);
+      // CORREÇÃO: api.post (Token automático via interceptor)
+      await api.post('/categories', { name: newCategoryName });
       
       alert('Categoria criada!');
       setNewCategoryName('');
@@ -45,11 +42,8 @@ export default function CategoriesAdmin() {
     if (!window.confirm("Tem certeza? Isso pode afetar produtos que usam essa categoria.")) return;
 
     try {
-      const token = localStorage.getItem('miniecommerce_token');
-      const config = { headers: { 'Authorization': `Bearer ${token}` } };
-      
-      // CORREÇÃO: api.delete
-      await api.delete(`/categories/${id}`, config);
+      // CORREÇÃO: api.delete (Token automático via interceptor)
+      await api.delete(`/categories/${id}`);
       loadCategories();
     } catch (error) {
       alert("Erro ao excluir. Talvez existam produtos vinculados a esta categoria.");

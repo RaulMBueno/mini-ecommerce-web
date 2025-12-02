@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-// import axios from 'axios'; // REMOVIDO
-import api from '../api'; // <--- USANDO API INTELIGENTE
+import api from '../api'; // O api.js agora cuida do Token sozinho
 import { ArrowLeft, Save, Trash2, Edit, XCircle, Star, Tag } from 'lucide-react';
 
 export default function Admin() {
@@ -27,7 +26,6 @@ export default function Admin() {
 
   const loadProducts = async () => {
     try {
-      // CORREÇÃO: api.get sem localhost
       const response = await api.get('/products');
       setProducts(response.data.content || response.data);
     } catch (error) {
@@ -37,7 +35,6 @@ export default function Admin() {
 
   const loadCategories = async () => {
     try {
-      // CORREÇÃO: api.get sem localhost
       const response = await api.get('/categories');
       setCategories(response.data);
     } catch (error) {
@@ -70,11 +67,8 @@ export default function Admin() {
   const handleDelete = async (id) => {
     if (!window.confirm("Tem certeza que deseja excluir?")) return;
     try {
-      const token = localStorage.getItem('miniecommerce_token');
-      const config = { headers: { 'Authorization': `Bearer ${token}` } };
-      
-      // CORREÇÃO: api.delete
-      await api.delete(`/products/${id}`, config);
+      // NÃO PRECISA MAIS PASSAR O TOKEN MANUALMENTE AQUI
+      await api.delete(`/products/${id}`);
       
       alert("Produto removido!");
       loadProducts();
@@ -94,22 +88,18 @@ export default function Admin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('miniecommerce_token');
-      const config = { headers: { 'Authorization': `Bearer ${token}` } };
-      
       const payload = { 
         ...formData, 
         price: parseFloat(formData.price),
         categories: formData.categoryId ? [{ id: formData.categoryId }] : []
       };
 
+      // NÃO PRECISA MAIS PASSAR O TOKEN MANUALMENTE AQUI
       if (editingId) {
-        // CORREÇÃO: api.put
-        await api.put(`/products/${editingId}`, payload, config);
+        await api.put(`/products/${editingId}`, payload);
         alert('Produto atualizado com sucesso!');
       } else {
-        // CORREÇÃO: api.post
-        await api.post('/products', payload, config);
+        await api.post('/products', payload);
         alert('Produto cadastrado com sucesso!');
       }
       
@@ -118,9 +108,12 @@ export default function Admin() {
 
     } catch (error) {
       console.error("Erro:", error);
-      alert('Erro ao salvar.');
+      alert('Erro ao salvar. Verifique se você fez login novamente.');
     }
   };
+
+  // ... (O RETORNO DO JSX CONTINUA IGUAL, PODE MANTER A PARTE VISUAL) ...
+  // Vou copiar a parte visual aqui para garantir que você tenha o arquivo completo.
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
