@@ -1,30 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, LogIn, Search, Menu, X, Loader, ExternalLink, Filter, ChevronRight } from 'lucide-react';
-// import axios from 'axios'; // REMOVIDO
-import api from '../api'; // <--- USANDO A API INTELIGENTE
+import { ShoppingCart, LogIn, LogOut, Search, Menu, X, Loader, ExternalLink, Filter, ChevronRight, User } from 'lucide-react'; // Adicionei LogOut e User
+import api from '../api';
 import FeaturedCarousel from '../components/FeaturedCarousel';
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // NOVO: Estado de login
   
-  // --- DADOS ---
   const [allProducts, setAllProducts] = useState([]); 
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  
-  // --- FILTRO SELECIONADO ---
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
+    checkLogin(); // Verifica se tem token ao abrir
   }, []);
 
-  // --- BUSCA DADOS DO JAVA ---
+  // --- VERIFICA SE ESTÁ LOGADO ---
+  const checkLogin = () => {
+    const token = localStorage.getItem('miniecommerce_token');
+    setIsLoggedIn(!!token); // Transforma em true/false
+  };
+
+  // --- FUNÇÃO DE SAIR (LOGOUT) ---
+  const handleLogout = () => {
+    localStorage.removeItem('miniecommerce_token'); // Rasga o crachá
+    setIsLoggedIn(false);
+    window.location.reload(); // Recarrega a página para limpar tudo
+  };
+
   const fetchData = async () => {
     try {
-      // CORREÇÃO: Usando api.get sem o localhost
       const [productsRes, categoriesRes] = await Promise.all([
         api.get('/products'),
         api.get('/categories')
@@ -45,7 +54,6 @@ export default function Home() {
 
   const filterBy = (categoryId) => {
     setSelectedCategory(categoryId);
-
     if (categoryId === 'all') {
       setFilteredProducts(allProducts);
     } else {
@@ -78,17 +86,35 @@ export default function Home() {
                 <Search className="h-5 w-5 text-gray-400 absolute left-3 top-2.5 group-focus-within:text-pink-500 transition-colors" />
               </div>
               
-              <Link to="/admin" className="text-gray-600 hover:text-pink-600 font-medium transition">Admin</Link>
+              {/* SÓ MOSTRA O LINK ADMIN SE ESTIVER LOGADO */}
+              {isLoggedIn && (
+                <Link to="/admin" className="text-gray-600 hover:text-pink-600 font-medium transition flex items-center gap-1">
+                    <User size={18}/> Painel
+                </Link>
+              )}
               
               <button className="relative p-2 text-gray-600 hover:text-pink-600 transition">
                 <ShoppingCart className="h-6 w-6" />
                 <span className="absolute -top-1 -right-1 bg-pink-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
               </button>
               
-              <Link to="/login" className="flex items-center space-x-2 bg-gray-900 text-white px-5 py-2 rounded-full hover:bg-gray-800 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                <LogIn className="h-4 w-4" />
-                <span>Entrar</span>
-              </Link>
+              {/* --- BOTÃO INTELIGENTE LOGIN / LOGOUT --- */}
+              {isLoggedIn ? (
+                <button 
+                  onClick={handleLogout} 
+                  className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-5 py-2 rounded-full hover:bg-gray-200 transition font-medium"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sair</span>
+                </button>
+              ) : (
+                <Link to="/login" className="flex items-center space-x-2 bg-gray-900 text-white px-5 py-2 rounded-full hover:bg-gray-800 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                  <LogIn className="h-4 w-4" />
+                  <span>Entrar</span>
+                </Link>
+              )}
+              {/* --------------------------------------- */}
+
             </div>
             
              <div className="md:hidden flex items-center">
@@ -100,7 +126,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* --- BANNER (HERO) --- */}
+      {/* Hero Section */}
       <div className="bg-gradient-to-r from-pink-50 to-white py-12 border-b border-pink-100">
         <div className="max-w-7xl mx-auto px-4 text-center md:text-left flex flex-col md:flex-row items-center gap-12">
           <div className="md:w-1/2 mb-8 md:mb-0">
@@ -123,7 +149,7 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto px-4 py-12 flex flex-col md:flex-row gap-8">
         
-        {/* SIDEBAR */}
+        {/* Sidebar */}
         <aside className="hidden md:block w-64 flex-shrink-0">
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 sticky top-24">
             <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
@@ -163,7 +189,7 @@ export default function Home() {
           </div>
         </aside>
 
-        {/* CONTEÚDO PRINCIPAL */}
+        {/* Conteúdo */}
         <div className="flex-1">
           
           <div className="md:hidden flex overflow-x-auto gap-3 pb-4 mb-6 scrollbar-hide">
@@ -204,6 +230,7 @@ export default function Home() {
                     <Search size={24}/>
                   </div>
                   <p className="text-gray-500 text-lg font-medium">Nenhum produto encontrado.</p>
+                  <p className="text-gray-400 text-sm">Tente selecionar outra categoria.</p>
                 </div>
               ) : (
                 filteredProducts.map((product) => (
