@@ -91,7 +91,7 @@ export default function Admin() {
       const payload = { 
         ...formData, 
         price: parseFloat(formData.price),
-        categories: formData.categoryId ? [{ id: formData.categoryId }] : []
+        categories: formData.categoryId ? [{ id: parseInt(formData.categoryId) }] : []
       };
 
       // NÃO PRECISA MAIS PASSAR O TOKEN MANUALMENTE AQUI
