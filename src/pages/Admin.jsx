@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-// AQUI ESTAVA O ERRO: Faltava importar o 'Tag'
+// import axios from 'axios'; // REMOVIDO
+import api from '../api'; // <--- USANDO API INTELIGENTE
 import { ArrowLeft, Save, Trash2, Edit, XCircle, Star, Tag } from 'lucide-react';
 
 export default function Admin() {
@@ -27,7 +27,8 @@ export default function Admin() {
 
   const loadProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/products');
+      // CORREÇÃO: api.get sem localhost
+      const response = await api.get('/products');
       setProducts(response.data.content || response.data);
     } catch (error) {
       console.error("Erro ao carregar produtos:", error);
@@ -36,7 +37,8 @@ export default function Admin() {
 
   const loadCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/categories');
+      // CORREÇÃO: api.get sem localhost
+      const response = await api.get('/categories');
       setCategories(response.data);
     } catch (error) {
       console.error("Erro ao carregar categorias:", error);
@@ -70,7 +72,10 @@ export default function Admin() {
     try {
       const token = localStorage.getItem('miniecommerce_token');
       const config = { headers: { 'Authorization': `Bearer ${token}` } };
-      await axios.delete(`http://localhost:8080/products/${id}`, config);
+      
+      // CORREÇÃO: api.delete
+      await api.delete(`/products/${id}`, config);
+      
       alert("Produto removido!");
       loadProducts();
     } catch (error) {
@@ -99,10 +104,12 @@ export default function Admin() {
       };
 
       if (editingId) {
-        await axios.put(`http://localhost:8080/products/${editingId}`, payload, config);
+        // CORREÇÃO: api.put
+        await api.put(`/products/${editingId}`, payload, config);
         alert('Produto atualizado com sucesso!');
       } else {
-        await axios.post('http://localhost:8080/products', payload, config);
+        // CORREÇÃO: api.post
+        await api.post('/products', payload, config);
         alert('Produto cadastrado com sucesso!');
       }
       
@@ -119,7 +126,6 @@ export default function Admin() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         
-        {/* CABEÇALHO DO ADMIN */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
             <Link to="/" className="p-2 bg-white rounded-full shadow hover:bg-gray-100 text-gray-600">
@@ -128,13 +134,11 @@ export default function Admin() {
             <h1 className="text-3xl font-bold text-gray-800">Painel Administrativo</h1>
           </div>
 
-          {/* BOTÃO PARA GERENCIAR CATEGORIAS */}
           <Link to="/admin/categories" className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm font-bold flex items-center justify-center gap-2 shadow-md">
             <Tag size={16} /> Gerenciar Categorias
           </Link>
         </div>
 
-        {/* --- FORMULÁRIO --- */}
         <div className={`bg-white rounded-xl shadow-lg p-8 mb-12 border-l-4 ${editingId ? 'border-yellow-500' : 'border-pink-600'}`}>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-gray-800">

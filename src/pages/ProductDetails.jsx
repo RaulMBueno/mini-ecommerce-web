@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom'; // Pega o ID da URL
-import axios from 'axios';
+// import axios from 'axios'; // REMOVIDO
+import api from '../api'; // <--- USANDO A API INTELIGENTE
 import { ShoppingCart, ExternalLink, ArrowLeft, Loader } from 'lucide-react';
 
 export default function ProductDetails() {
@@ -9,8 +10,8 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Busca os detalhes deste produto específico
-    axios.get(`http://localhost:8080/products/${id}`)
+    // CORREÇÃO: Usando api.get e removendo o localhost
+    api.get(`/products/${id}`)
       .then(response => {
         setProduct(response.data);
         setLoading(false);

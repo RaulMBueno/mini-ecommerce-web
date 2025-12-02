@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Para mudar de página
+import api from '../api'; // <--- Usamos o nosso cliente inteligente
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -10,19 +10,18 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // 1. Envia email/senha para o Java
-      const response = await axios.post('http://localhost:8080/auth/login', {
+      // CORREÇÃO AQUI: Usamos 'api.post' e removemos o localhost
+      const response = await api.post('/auth/login', {
         email: email,
         password: password
       });
 
-      // 2. Se deu certo, pega o Token
+      // Se deu certo, pega o Token
       const token = response.data.token;
       
-      // 3. Guarda o Token no navegador (Armazenamento Local)
+      // Guarda o Token no navegador
       localStorage.setItem('miniecommerce_token', token);
 
-      // 4. Manda o usuário para o Painel Admin
       alert("Login realizado com sucesso!");
       navigate('/admin');
 

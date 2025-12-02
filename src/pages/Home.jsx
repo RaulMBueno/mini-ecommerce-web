@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, LogIn, Search, Menu, X, Loader, ExternalLink, Filter, ChevronRight } from 'lucide-react';
-import axios from 'axios';
+// import axios from 'axios'; // REMOVIDO
+import api from '../api'; // <--- USANDO A API INTELIGENTE
 import FeaturedCarousel from '../components/FeaturedCarousel';
 
 export default function Home() {
@@ -20,11 +21,13 @@ export default function Home() {
     fetchData();
   }, []);
 
+  // --- BUSCA DADOS DO JAVA ---
   const fetchData = async () => {
     try {
+      // CORREÇÃO: Usando api.get sem o localhost
       const [productsRes, categoriesRes] = await Promise.all([
-        axios.get('http://localhost:8080/products'),
-        axios.get('http://localhost:8080/categories')
+        api.get('/products'),
+        api.get('/categories')
       ]);
 
       const productsData = productsRes.data.content || productsRes.data;
@@ -63,7 +66,6 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex-shrink-0 flex items-center gap-2">
-              {/* Logo ou Ícone */}
               <div className="w-8 h-8 bg-pink-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xl">R</span>
               </div>
@@ -99,7 +101,6 @@ export default function Home() {
       </nav>
 
       {/* --- BANNER (HERO) --- */}
-      {/* Mantive o banner fora da divisão de colunas para dar impacto visual */}
       <div className="bg-gradient-to-r from-pink-50 to-white py-12 border-b border-pink-100">
         <div className="max-w-7xl mx-auto px-4 text-center md:text-left flex flex-col md:flex-row items-center gap-12">
           <div className="md:w-1/2 mb-8 md:mb-0">
@@ -120,10 +121,9 @@ export default function Home() {
         </div>
       </div>
 
-      {/* --- LAYOUT PRINCIPAL (SIDEBAR + CONTEÚDO) --- */}
       <div className="max-w-7xl mx-auto px-4 py-12 flex flex-col md:flex-row gap-8">
         
-        {/* --- 1. SIDEBAR (Lateral Esquerda - Só Desktop) --- */}
+        {/* SIDEBAR */}
         <aside className="hidden md:block w-64 flex-shrink-0">
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 sticky top-24">
             <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
@@ -149,8 +149,6 @@ export default function Home() {
                 </button>
               ))}
             </div>
-
-            {/* Bannerzinho extra na sidebar */}
             <div className="mt-8 p-4 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl text-center">
               <p className="text-purple-800 font-bold text-sm mb-2">Quer aprender?</p>
               <p className="text-gray-600 text-xs mb-3">Confira nossos cursos de automaquiagem.</p>
@@ -165,10 +163,9 @@ export default function Home() {
           </div>
         </aside>
 
-        {/* --- 2. CONTEÚDO PRINCIPAL (Direita) --- */}
+        {/* CONTEÚDO PRINCIPAL */}
         <div className="flex-1">
           
-          {/* Menu Horizontal (Só Mobile - Para não perder a usabilidade no celular) */}
           <div className="md:hidden flex overflow-x-auto gap-3 pb-4 mb-6 scrollbar-hide">
             <button onClick={() => filterBy('all')} className={`whitespace-nowrap px-4 py-2 rounded-full border ${selectedCategory === 'all' ? 'bg-pink-600 text-white border-pink-600' : 'bg-white text-gray-600'}`}>Todos</button>
             {categories.map(cat => (
@@ -178,7 +175,6 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Carrossel de Destaques */}
           {featuredProducts.length > 0 && (
             <div className="mb-12">
               <div className="flex items-center gap-3 mb-6">
@@ -189,7 +185,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* Título da Lista */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-800">
               {selectedCategory === 'all' ? 'Vitrine Completa' : categories.find(c => c.id === selectedCategory)?.name || 'Produtos'}
@@ -197,7 +192,6 @@ export default function Home() {
             <span className="text-sm text-gray-500">{filteredProducts.length} produtos encontrados</span>
           </div>
 
-          {/* Grid de Produtos */}
           {loading ? (
             <div className="flex justify-center items-center h-64 bg-white rounded-2xl shadow-sm">
               <Loader className="h-10 w-10 text-pink-600 animate-spin" />
@@ -210,7 +204,6 @@ export default function Home() {
                     <Search size={24}/>
                   </div>
                   <p className="text-gray-500 text-lg font-medium">Nenhum produto encontrado.</p>
-                  <p className="text-gray-400 text-sm">Tente selecionar outra categoria.</p>
                 </div>
               ) : (
                 filteredProducts.map((product) => (
@@ -246,11 +239,10 @@ export default function Home() {
                         </p>
                       )}
 
-                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
-                        {/* Apenas o preço real */}
-                          <span className="text-2xl font-bold text-pink-600">
-                            R$ {product.price?.toFixed(2)}
-                          </span>
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
+                        <span className="text-2xl font-bold text-pink-600">
+                          R$ {product.price?.toFixed(2)}
+                        </span>
 
                         {product.affiliateUrl ? (
                           <a 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+// import axios from 'axios'; // REMOVIDO
+import api from '../api'; // <--- USANDO API INTELIGENTE
 import { ArrowLeft, Plus, Trash2, Tag } from 'lucide-react';
 
 export default function CategoriesAdmin() {
@@ -13,7 +14,8 @@ export default function CategoriesAdmin() {
 
   const loadCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/categories');
+      // CORREÇÃO: api.get
+      const response = await api.get('/categories');
       setCategories(response.data);
     } catch (error) {
       console.error("Erro ao carregar categorias:", error);
@@ -28,7 +30,8 @@ export default function CategoriesAdmin() {
       const token = localStorage.getItem('miniecommerce_token');
       const config = { headers: { 'Authorization': `Bearer ${token}` } };
       
-      await axios.post('http://localhost:8080/categories', { name: newCategoryName }, config);
+      // CORREÇÃO: api.post
+      await api.post('/categories', { name: newCategoryName }, config);
       
       alert('Categoria criada!');
       setNewCategoryName('');
@@ -45,7 +48,8 @@ export default function CategoriesAdmin() {
       const token = localStorage.getItem('miniecommerce_token');
       const config = { headers: { 'Authorization': `Bearer ${token}` } };
       
-      await axios.delete(`http://localhost:8080/categories/${id}`, config);
+      // CORREÇÃO: api.delete
+      await api.delete(`/categories/${id}`, config);
       loadCategories();
     } catch (error) {
       alert("Erro ao excluir. Talvez existam produtos vinculados a esta categoria.");
