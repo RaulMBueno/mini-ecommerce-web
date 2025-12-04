@@ -75,26 +75,12 @@ export default function Home() {
 
   const featuredProducts = allProducts.filter((p) => p.isFeatured === true);
 
-  // SLIDE ESPECIAL DO HERO BANNER PARA O CARROSSEL
-  const bannerSlide = {
-    id: 'hero-banner',
-    name: 'ReMakeup Store',
-    description: 'Destaques do dia: ofertas especiais selecionadas para você.',
-    price: null,
-    imgUrl: '/hero-banner.jpg',
-    type: 'HERO',
-    affiliateUrl: null,
-  };
-
-  const carouselProducts = [bannerSlide, ...featuredProducts];
-
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
       {/* NAVBAR */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            {/* Logo */}
             <div className="flex-shrink-0 flex items-center gap-2">
               <div className="w-8 h-8 bg-pink-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xl">R</span>
@@ -104,7 +90,7 @@ export default function Home() {
               </span>
             </div>
 
-            {/* Desktop menu */}
+            {/* DESKTOP MENU */}
             <div className="hidden md:flex space-x-8 items-center">
               <div className="relative group">
                 <input
@@ -150,66 +136,49 @@ export default function Home() {
               )}
             </div>
 
-            {/* Botão menu mobile */}
+            {/* MOBILE MENU BUTTON */}
             <div className="md:hidden flex items-center">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="text-gray-600 hover:text-pink-600"
               >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* MENU MOBILE DROPDOWN */}
+      {/* MOBILE MENU (opcional: categorias / login) */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 py-4 space-y-4">
-            {/* Login / Logout */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <User size={18} className="text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">
-                  {isLoggedIn ? 'Você está logado' : 'Bem-vinda à ReMakeup'}
-                </span>
-              </div>
-              {isLoggedIn ? (
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-1 text-xs bg-gray-100 px-3 py-1.5 rounded-full text-gray-700"
-                >
-                  <LogOut size={14} />
-                  Sair
-                </button>
-              ) : (
-                <Link
-                  to="/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-1 text-xs bg-gray-900 px-3 py-1.5 rounded-full text-white"
-                >
-                  <LogIn size={14} />
-                  Entrar
-                </Link>
-              )}
-            </div>
-
-            {/* Link para painel (se logado) */}
+          <div className="px-4 py-3 flex flex-col gap-3">
             {isLoggedIn && (
               <Link
                 to="/admin"
+                className="flex items-center gap-2 text-gray-700 font-medium"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 text-sm text-gray-700"
               >
-                <User size={16} />
-                Ir para o Painel
+                <User size={18} /> Painel Administrativo
               </Link>
             )}
 
-            {/* Categorias */}
-            <div>
-              <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">
+            {!isLoggedIn && (
+              <Link
+                to="/login"
+                className="flex items-center gap-2 text-pink-600 font-semibold"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <LogIn size={18} /> Entrar
+              </Link>
+            )}
+
+            <div className="border-t pt-3 mt-2">
+              <p className="text-xs font-semibold text-gray-400 mb-2 uppercase">
                 Categorias
               </p>
               <div className="flex flex-wrap gap-2">
@@ -218,10 +187,10 @@ export default function Home() {
                     filterBy('all');
                     setIsMenuOpen(false);
                   }}
-                  className={`text-xs px-3 py-1.5 rounded-full border ${
+                  className={`px-3 py-1.5 text-xs rounded-full border ${
                     selectedCategory === 'all'
                       ? 'bg-pink-600 text-white border-pink-600'
-                      : 'bg-white text-gray-700'
+                      : 'bg-white text-gray-600'
                   }`}
                 >
                   Todos
@@ -233,10 +202,10 @@ export default function Home() {
                       filterBy(cat.id);
                       setIsMenuOpen(false);
                     }}
-                    className={`text-xs px-3 py-1.5 rounded-full border ${
+                    className={`px-3 py-1.5 text-xs rounded-full border ${
                       selectedCategory === cat.id
                         ? 'bg-pink-600 text-white border-pink-600'
-                        : 'bg-white text-gray-700'
+                        : 'bg-white text-gray-600'
                     }`}
                   >
                     {cat.name}
@@ -248,42 +217,24 @@ export default function Home() {
         </div>
       )}
 
-      {/* HERO – AGORA SÓ NO DESKTOP */}
-      <div className="bg-gradient-to-r from-pink-50 to-white py-12 border-b border-pink-100 hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 text-center md:text-left flex flex-col md:flex-row items-center gap-12">
-          <div className="md:w-1/2 mb-8 md:mb-0">
-            <span className="inline-block px-4 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-semibold mb-4 tracking-wide uppercase">
-              Novos Achadinhos
-            </span>
-            <h1 className="text-3xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
-              Realce sua <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
-                Beleza Única
-              </span>
-            </h1>
-            <p className="text-lg text-gray-600 mb-8 leading-relaxed max-w-lg">
-              Curadoria exclusiva das melhores maquiagens, skincare e cursos
-              profissionais selecionados especialmente para você.
-            </p>
+      {/* HERO COM CARROSSEL (DESKTOP E MOBILE) */}
+      {featuredProducts.length > 0 && (
+        <section className="bg-gradient-to-r from-pink-50 to-white py-6 md:py-10 border-b border-pink-100">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex items-center gap-3 mb-4 md:mb-6">
+              <div className="h-8 w-1 bg-pink-600 rounded-full" />
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+                Destaques da Semana
+              </h2>
+            </div>
+            <FeaturedCarousel products={featuredProducts} />
           </div>
-          <div className="md:w-1/2 relative">
-            <div className="absolute inset-0 bg-pink-200 rounded-full filter blur-3xl opacity-30 animate-pulse"></div>
-            <img
-              src="/hero-banner.jpg"
-              alt="Hero"
-              className="relative rounded-2xl shadow-2xl w-full h-72 object-cover transform rotate-2 hover:rotate-0 transition duration-700 ease-in-out"
-              onError={(e) =>
-                (e.currentTarget.src =
-                  'https://images.unsplash.com/photo-1596462502278-27bfdd403348?q=80&w=1000')
-              }
-            />
-          </div>
-        </div>
-      </div>
+        </section>
+      )}
 
-      {/* CONTEÚDO PRINCIPAL */}
-      <div className="max-w-7xl mx-auto px-4 py-12 flex flex-col md:flex-row gap-8">
-        {/* SIDEBAR (desktop) */}
+      {/* MAIN CONTENT */}
+      <div className="max-w-7xl mx-auto px-4 py-10 flex flex-col md:flex-row gap-8">
+        {/* SIDEBAR DESKTOP */}
         <aside className="hidden md:block w-64 flex-shrink-0">
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 sticky top-24">
             <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
@@ -319,13 +270,17 @@ export default function Home() {
             </div>
 
             <div className="mt-8 p-4 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl text-center">
-              <p className="text-purple-800 font-bold text-sm mb-2">Quer aprender?</p>
+              <p className="text-purple-800 font-bold text-sm mb-2">
+                Quer aprender?
+              </p>
               <p className="text-gray-600 text-xs mb-3">
                 Confira nossos cursos de automaquiagem.
               </p>
               <button
                 onClick={() => {
-                  const cursoCat = categories.find((c) => c.name.includes('Curso'));
+                  const cursoCat = categories.find((c) =>
+                    c.name.includes('Curso'),
+                  );
                   if (cursoCat) filterBy(cursoCat.id);
                 }}
                 className="text-xs font-bold text-pink-600 hover:underline"
@@ -336,9 +291,9 @@ export default function Home() {
           </div>
         </aside>
 
-        {/* CONTEÚDO */}
+        {/* CONTEÚDO PRINCIPAL */}
         <div className="flex-1">
-          {/* FILTRO MOBILE (chips) – continua, porque é útil */}
+          {/* FILTROS MOBILE (já temos no menu, então aqui pode ficar simples) */}
           <div className="md:hidden flex overflow-x-auto gap-3 pb-4 mb-6 scrollbar-hide">
             <button
               onClick={() => filterBy('all')}
@@ -365,40 +320,26 @@ export default function Home() {
             ))}
           </div>
 
-          {/* CARROSSEL DESTAQUES (com hero como primeiro slide) */}
-          {carouselProducts.length > 0 && (
-            <div className="mb-12">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-8 w-1 bg-pink-600 rounded-full"></div>
-                <h2 className="text-2xl font-bold text-gray-800">
-                  Destaques da Semana
-                </h2>
-              </div>
-              <FeaturedCarousel products={carouselProducts} />
-            </div>
-          )}
-
-          {/* TÍTULO VITRINE */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-800">
               {selectedCategory === 'all'
                 ? 'Vitrine Completa'
-                : categories.find((c) => c.id === selectedCategory)?.name || 'Produtos'}
+                : categories.find((c) => c.id === selectedCategory)?.name ||
+                  'Produtos'}
             </h2>
             <span className="text-sm text-gray-500">
               {filteredProducts.length} produtos encontrados
             </span>
           </div>
 
-          {/* VITRINE */}
           {loading ? (
             <div className="flex justify-center items-center h-64 bg-white rounded-2xl shadow-sm">
               <Loader className="h-10 w-10 text-pink-600 animate-spin" />
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProducts.length === 0 ? (
-                <div className="col-span-full text-center py-16 bg-white rounded-2xl border border-dashed border-gray-300">
+                <div className="col-span-full text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
                   <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400">
                     <Search size={24} />
                   </div>
@@ -413,13 +354,12 @@ export default function Home() {
                 filteredProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col h-full border border-gray-100 group"
+                    className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full border border-gray-100 group"
                   >
-                    {/* IMAGEM */}
-                    <div className="relative overflow-hidden rounded-t-xl">
+                    <div className="relative overflow-hidden rounded-t-2xl">
                       <Link to={`/product/${product.id}`}>
                         <img
-                          className="w-full h-40 sm:h-52 object-cover cursor-pointer group-hover:scale-110 transition duration-700"
+                          className="w-full h-40 sm:h-48 object-cover cursor-pointer group-hover:scale-110 transition duration-700"
                           src={
                             product.imgUrl
                               ? product.imgUrl
@@ -429,36 +369,37 @@ export default function Home() {
                           title="Clique para ver detalhes"
                         />
                       </Link>
-
                       {product.type === 'AFFILIATE' && (
-                        <span className="absolute top-2 right-2 bg-white/90 backdrop-blur text-purple-700 text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow-sm">
+                        <span className="absolute top-3 right-3 bg-white/90 backdrop-blur text-purple-700 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
                           Parceiro
                         </span>
                       )}
                     </div>
 
-                    {/* TEXTO / INFO */}
-                    <div className="p-3 sm:p-4 flex flex-col flex-grow">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
-                        {product.categories && product.categories.length > 0
-                          ? product.categories[0].name
-                          : 'Geral'}
-                      </span>
-
-                      <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-1 leading-snug line-clamp-2 group-hover:text-pink-600 transition">
+                    <div className="p-4 sm:p-5 flex flex-col flex-grow">
+                      <div className="mb-1">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                          {product.categories && product.categories.length > 0
+                            ? product.categories[0].name
+                            : 'Geral'}
+                        </span>
+                      </div>
+                      <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-1 leading-tight group-hover:text-pink-600 transition">
                         {product.name}
                       </h3>
-
-                      {/* Sem descrição na vitrine – só na página de detalhes */}
+                      {/* DESCRIÇÃO RESUMIDA */}
+                      <p className="text-gray-500 text-xs sm:text-sm mb-3 line-clamp-2">
+                        {product.description}
+                      </p>
 
                       {product.affiliateUrl && (
-                        <p className="hidden md:flex text-[10px] text-gray-400 italic mb-2 items-center gap-1 bg-gray-50 p-1.5 rounded w-fit">
+                        <p className="text-[10px] text-gray-400 italic mb-2 flex items-center gap-1 bg-gray-50 p-1.5 rounded w-fit">
                           ⚠️ Preço sujeito a alteração
                         </p>
                       )}
 
-                      <div className="flex items-center justify-between mt-auto pt-2 sm:pt-3 border-t border-gray-50">
-                        <span className="text-sm sm:text-base font-bold text-pink-600">
+                      <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
+                        <span className="text-lg sm:text-xl font-bold text-pink-600">
                           R$ {product.price?.toFixed(2)}
                         </span>
 
@@ -467,14 +408,13 @@ export default function Home() {
                             href={product.affiliateUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 bg-pink-50 text-pink-600 px-2.5 py-1.5 rounded-lg hover:bg-pink-600 hover:text-white transition font-semibold text-[11px] sm:text-xs"
+                            className="flex items-center gap-2 bg-pink-50 text-pink-600 px-3 py-2 rounded-xl hover:bg-pink-600 hover:text-white transition font-bold text-xs sm:text-sm"
                           >
-                            Ver oferta
-                            <ExternalLink size={14} />
+                            Ver Oferta <ExternalLink size={14} />
                           </a>
                         ) : (
-                          <button className="p-2 sm:p-2.5 bg-gray-900 rounded-lg hover:bg-black text-white transition shadow-md">
-                            <ShoppingCart size={16} />
+                          <button className="p-2.5 bg-gray-900 rounded-xl hover:bg-black text-white transition shadow-lg hover:shadow-gray-900/30">
+                            <ShoppingCart size={18} />
                           </button>
                         )}
                       </div>

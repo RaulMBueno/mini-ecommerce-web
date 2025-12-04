@@ -7,67 +7,98 @@ export default function FeaturedCarousel({ products }) {
 
   if (!products || products.length === 0) return null;
 
+  // 1 (hero) + produtos
+  const totalSlides = products.length + 1;
+
+  // autoplay
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % totalSlides);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [totalSlides]);
+
   const nextSlide = () => {
-    setCurrent((prev) => (prev === products.length - 1 ? 0 : prev + 1));
+    setCurrent((prev) => (prev + 1) % totalSlides);
   };
 
   const prevSlide = () => {
-    setCurrent((prev) => (prev === 0 ? products.length - 1 : prev - 1));
+    setCurrent((prev) => (prev - 1 + totalSlides) % totalSlides);
   };
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      nextSlide();
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [products.length]);
+  const goTo = (index) => setCurrent(index);
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto mb-12 overflow-hidden rounded-2xl shadow-2xl bg-white h-[260px] md:h-[400px]">
+    <div className="relative w-full max-w-7xl mx-auto mb-6 md:mb-12 overflow-hidden rounded-2xl shadow-2xl bg-white h-[260px] md:h-[420px]">
       <div className="w-full h-full relative">
-        {products.map((product, index) => {
-          const isActive = index === current;
+        {/* =========================================================
+           SLIDE 0 — HERO REMAKEUP (desktop + mobile)
+        ========================================================== */}
+        <div
+          className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+            current === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'
+          }`}
+        >
+          <div className="w-full h-full relative">
+            <img
+              src="/hero-banner.jpg"
+              alt="ReMakeup Store"
+              className="w-full h-full object-cover"
+            />
 
-          // SLIDE ESPECIAL: HERO BANNER
-          if (product.type === 'HERO') {
-            return (
-              <div
-                key={product.id || index}
-                className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
-                  isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                }`}
-              >
-                <div className="relative w-full h-full">
-                  <img
-                    src={product.imgUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover object-center"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-6 md:p-10">
-                    <span className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] text-pink-100 mb-1">
-                      Destaques do dia
-                    </span>
-                    <h2 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight">
-                      {product.name}
-                    </h2>
-                    <p className="hidden md:block text-sm text-pink-50 max-w-md">
-                      {product.description}
-                    </p>
-                  </div>
+            {/* overlay geral */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent md:from-white md:via-white/85 md:to-transparent" />
+
+            <div className="absolute inset-0 flex flex-col md:flex-row items-center md:items-center justify-center px-5 md:px-12 gap-6">
+              {/* TEXTO PRINCIPAL */}
+              <div className="w-full md:w-2/3 lg:w-1/2 text-left z-20">
+                <span className="inline-flex items-center px-3 py-1 bg-pink-600/90 text-white text-[11px] font-semibold rounded-full mb-3 uppercase tracking-wide">
+                  Destaques do dia 🔥
+                </span>
+
+                <h2 className="text-2xl md:text-4xl font-extrabold text-white md:text-gray-900 leading-tight mb-3">
+                  Realce sua{' '}
+                  <span className="text-pink-200 md:text-pink-600">
+                    beleza única
+                  </span>
+                </h2>
+
+                <p className="text-sm md:text-base text-gray-100 md:text-gray-600 max-w-md mb-4 md:mb-6">
+                  ReMakeup Store: seleção especial de maquiagens, skincare e
+                  cursos pensados para valorizar o seu estilo.
+                </p>
+
+                <div className="flex items-center gap-3">
+                  <Link
+                    to="/"
+                    className="px-5 py-2.5 md:px-7 md:py-3 bg-pink-600 text-white text-sm md:text-base font-bold rounded-full shadow-lg hover:bg-pink-700 transition"
+                  >
+                    Ver produtos
+                  </Link>
+                  <span className="hidden md:inline text-sm text-gray-500">
+                    Role para ver a vitrine completa
+                  </span>
                 </div>
               </div>
-            );
-          }
+            </div>
+          </div>
+        </div>
 
-          // SLIDE NORMAL: PRODUTO DESTACADO
+        {/* =========================================================
+           SLIDES DE PRODUTOS (1..N)
+        ========================================================== */}
+        {products.map((product, index) => {
+          const slideIndex = index + 1; // 0 é o hero
+
           return (
             <div
               key={product.id}
               className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ease-in-out flex flex-col md:flex-row ${
-                isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                current === slideIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
               }`}
             >
-              {/* DESKTOP: texto à esquerda */}
+              {/* TEXTO — DESKTOP */}
               <div className="hidden md:flex md:w-1/2 p-10 flex-col justify-center bg-gradient-to-r from-pink-50 to-white z-20">
                 <span className="text-pink-600 font-bold tracking-widest uppercase text-sm mb-2">
                   Destaque do Dia 🔥
@@ -80,6 +111,7 @@ export default function FeaturedCarousel({ products }) {
                   {product.name}
                 </h2>
 
+                {/* descrição limitada */}
                 <p
                   className="text-gray-500 text-base mb-6 max-h-16 overflow-hidden"
                   title={product.description}
@@ -112,7 +144,7 @@ export default function FeaturedCarousel({ products }) {
                 </div>
               </div>
 
-              {/* IMAGEM (DESKTOP + MOBILE) */}
+              {/* IMAGEM + OVERLAY — MOBILE (e lado direito no desktop) */}
               <Link
                 to={`/product/${product.id}`}
                 className="w-full md:w-1/2 h-full relative block"
@@ -123,12 +155,12 @@ export default function FeaturedCarousel({ products }) {
                   className="w-full h-full object-cover object-center"
                 />
 
-                {/* Badge no topo para mobile */}
+                {/* badge no mobile */}
                 <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-pink-600/90 text-[11px] font-bold text-white md:hidden">
                   Destaque do dia
                 </div>
 
-                {/* Nome + preço sobre a imagem no MOBILE */}
+                {/* nome + preço sobre a imagem no mobile */}
                 <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent md:hidden">
                   <div className="text-sm font-semibold text-white truncate">
                     {product.name}
@@ -150,6 +182,7 @@ export default function FeaturedCarousel({ products }) {
       >
         <ChevronLeft size={20} />
       </button>
+
       <button
         onClick={nextSlide}
         className="absolute top-1/2 right-2 md:right-4 -translate-y-1/2 z-30 p-2 rounded-full bg-white/50 hover:bg-white text-gray-800 shadow-lg transition backdrop-blur-sm"
@@ -157,12 +190,12 @@ export default function FeaturedCarousel({ products }) {
         <ChevronRight size={20} />
       </button>
 
-      {/* BOLINHAS */}
+      {/* BOLINHAS (HERO + PRODUTOS) */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-2">
-        {products.map((_, idx) => (
+        {Array.from({ length: totalSlides }).map((_, idx) => (
           <button
             key={idx}
-            onClick={() => setCurrent(idx)}
+            onClick={() => goTo(idx)}
             className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all ${
               idx === current
                 ? 'bg-pink-600 w-6 md:w-8'
