@@ -31,7 +31,6 @@ export default function Home() {
     checkLogin();
   }, []);
 
-  // Verifica token no localStorage
   const checkLogin = () => {
     const token = localStorage.getItem('miniecommerce_token');
     setIsLoggedIn(!!token);
@@ -75,6 +74,19 @@ export default function Home() {
   };
 
   const featuredProducts = allProducts.filter((p) => p.isFeatured === true);
+
+  // SLIDE ESPECIAL DO HERO BANNER PARA O CARROSSEL
+  const bannerSlide = {
+    id: 'hero-banner',
+    name: 'ReMakeup Store',
+    description: 'Destaques do dia: ofertas especiais selecionadas para você.',
+    price: null,
+    imgUrl: '/hero-banner.jpg',
+    type: 'HERO',
+    affiliateUrl: null,
+  };
+
+  const carouselProducts = [bannerSlide, ...featuredProducts];
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
@@ -138,7 +150,7 @@ export default function Home() {
               )}
             </div>
 
-            {/* Botão menu mobile (visual) */}
+            {/* Botão menu mobile */}
             <div className="md:hidden flex items-center">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -151,14 +163,99 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* HERO */}
-      <div className="bg-gradient-to-r from-pink-50 to-white py-12 border-b border-pink-100">
+      {/* MENU MOBILE DROPDOWN */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-4 py-4 space-y-4">
+            {/* Login / Logout */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <User size={18} className="text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">
+                  {isLoggedIn ? 'Você está logado' : 'Bem-vinda à ReMakeup'}
+                </span>
+              </div>
+              {isLoggedIn ? (
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1 text-xs bg-gray-100 px-3 py-1.5 rounded-full text-gray-700"
+                >
+                  <LogOut size={14} />
+                  Sair
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-1 text-xs bg-gray-900 px-3 py-1.5 rounded-full text-white"
+                >
+                  <LogIn size={14} />
+                  Entrar
+                </Link>
+              )}
+            </div>
+
+            {/* Link para painel (se logado) */}
+            {isLoggedIn && (
+              <Link
+                to="/admin"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-2 text-sm text-gray-700"
+              >
+                <User size={16} />
+                Ir para o Painel
+              </Link>
+            )}
+
+            {/* Categorias */}
+            <div>
+              <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">
+                Categorias
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => {
+                    filterBy('all');
+                    setIsMenuOpen(false);
+                  }}
+                  className={`text-xs px-3 py-1.5 rounded-full border ${
+                    selectedCategory === 'all'
+                      ? 'bg-pink-600 text-white border-pink-600'
+                      : 'bg-white text-gray-700'
+                  }`}
+                >
+                  Todos
+                </button>
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      filterBy(cat.id);
+                      setIsMenuOpen(false);
+                    }}
+                    className={`text-xs px-3 py-1.5 rounded-full border ${
+                      selectedCategory === cat.id
+                        ? 'bg-pink-600 text-white border-pink-600'
+                        : 'bg-white text-gray-700'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* HERO – AGORA SÓ NO DESKTOP */}
+      <div className="bg-gradient-to-r from-pink-50 to-white py-12 border-b border-pink-100 hidden md:block">
         <div className="max-w-7xl mx-auto px-4 text-center md:text-left flex flex-col md:flex-row items-center gap-12">
           <div className="md:w-1/2 mb-8 md:mb-0">
             <span className="inline-block px-4 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-semibold mb-4 tracking-wide uppercase">
               Novos Achadinhos
             </span>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-3xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
               Realce sua <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
                 Beleza Única
@@ -241,7 +338,7 @@ export default function Home() {
 
         {/* CONTEÚDO */}
         <div className="flex-1">
-          {/* FILTRO MOBILE (chips) */}
+          {/* FILTRO MOBILE (chips) – continua, porque é útil */}
           <div className="md:hidden flex overflow-x-auto gap-3 pb-4 mb-6 scrollbar-hide">
             <button
               onClick={() => filterBy('all')}
@@ -268,14 +365,16 @@ export default function Home() {
             ))}
           </div>
 
-          {/* CARROSSEL DESTAQUES */}
-          {featuredProducts.length > 0 && (
+          {/* CARROSSEL DESTAQUES (com hero como primeiro slide) */}
+          {carouselProducts.length > 0 && (
             <div className="mb-12">
               <div className="flex items-center gap-3 mb-6">
                 <div className="h-8 w-1 bg-pink-600 rounded-full"></div>
-                <h2 className="text-2xl font-bold text-gray-800">Destaques da Semana</h2>
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Destaques da Semana
+                </h2>
               </div>
-              <FeaturedCarousel products={featuredProducts} />
+              <FeaturedCarousel products={carouselProducts} />
             </div>
           )}
 
@@ -346,21 +445,18 @@ export default function Home() {
                           : 'Geral'}
                       </span>
 
-                      {/* Nome: compacto, 2 linhas máx se o plugin de clamp estiver ativo */}
                       <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-1 leading-snug line-clamp-2 group-hover:text-pink-600 transition">
                         {product.name}
                       </h3>
 
                       {/* Sem descrição na vitrine – só na página de detalhes */}
 
-                      {/* Aviso afiliado: só desktop */}
                       {product.affiliateUrl && (
                         <p className="hidden md:flex text-[10px] text-gray-400 italic mb-2 items-center gap-1 bg-gray-50 p-1.5 rounded w-fit">
                           ⚠️ Preço sujeito a alteração
                         </p>
                       )}
 
-                      {/* PREÇO + AÇÃO */}
                       <div className="flex items-center justify-between mt-auto pt-2 sm:pt-3 border-t border-gray-50">
                         <span className="text-sm sm:text-base font-bold text-pink-600">
                           R$ {product.price?.toFixed(2)}
