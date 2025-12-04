@@ -47,8 +47,8 @@ export default function FeaturedCarousel({ products }) {
               className="w-full h-full object-cover"
             />
 
-            {/* overlay geral */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent md:from-white md:via-white/85 md:to-transparent" />
+            {/* overlay geral – AGORA CLARO EM TODAS AS TELAS */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/85 to-transparent" />
 
             <div className="absolute inset-0 flex flex-col md:flex-row items-center md:items-center justify-center px-5 md:px-12 gap-6">
               {/* TEXTO PRINCIPAL */}
@@ -57,14 +57,14 @@ export default function FeaturedCarousel({ products }) {
                   Destaques do dia 🔥
                 </span>
 
-                <h2 className="text-2xl md:text-4xl font-extrabold text-white md:text-gray-900 leading-tight mb-3">
+                <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-3">
                   Realce sua{' '}
-                  <span className="text-pink-200 md:text-pink-600">
+                  <span className="text-pink-600">
                     beleza única
                   </span>
                 </h2>
 
-                <p className="text-sm md:text-base text-gray-100 md:text-gray-600 max-w-md mb-4 md:mb-6">
+                <p className="text-sm md:text-base text-gray-600 max-w-md mb-4 md:mb-6">
                   ReMakeup Store: seleção especial de maquiagens, skincare e
                   cursos pensados para valorizar o seu estilo.
                 </p>
