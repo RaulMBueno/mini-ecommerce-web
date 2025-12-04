@@ -23,76 +23,103 @@ export default function FeaturedCarousel({ products }) {
   }, [current, products.length]);
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto mb-12 overflow-hidden rounded-2xl shadow-2xl bg-white h-[300px] md:h-[400px]">
-      
+    <div className="relative w-full max-w-7xl mx-auto mb-12 overflow-hidden rounded-2xl shadow-2xl bg-white h-[260px] md:h-[400px]">
       <div className="w-full h-full relative">
         {products.map((product, index) => (
-          <div 
+          <div
             key={product.id}
             className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ease-in-out flex flex-col md:flex-row
               ${index === current ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
           >
-            {/* LADO ESQUERDO: TEXTO */}
-            <div className="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center bg-gradient-to-r from-pink-50 to-white z-20">
-              
-              <span className="text-pink-600 font-bold tracking-widest uppercase text-xs md:text-sm mb-2">
+            {/* DESKTOP: LADO ESQUERDO COM TEXTO */}
+            <div className="hidden md:flex md:w-1/2 p-10 flex-col justify-center bg-gradient-to-r from-pink-50 to-white z-20">
+              <span className="text-pink-600 font-bold tracking-widest uppercase text-sm mb-2">
                 Destaque do Dia 🔥
               </span>
-              
-              {/* TÍTULO: Limita a 2 linhas e ajusta o tamanho */}
-              <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 mb-2 md:mb-4 leading-tight line-clamp-2" title={product.name}>
+
+              {/* Nome SEMPRE visível, limitado a 2 linhas */}
+              <h2
+                className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 leading-tight"
+                title={product.name}
+              >
                 {product.name}
               </h2>
-              
-              {/* DESCRIÇÃO: Esconde no celular (hidden), mostra no PC (md:block) limitado a 2 linhas */}
-              <p className="hidden md:block text-gray-500 text-sm md:text-base mb-6 line-clamp-2">
+
+              {/* Descrição: limitada em altura para não “engolir” o layout */}
+              <p
+                className="text-gray-500 text-base mb-6 max-h-16 overflow-hidden"
+                title={product.description}
+              >
                 {product.description}
               </p>
-              
-              <div className="flex items-center gap-4 mt-auto md:mt-0">
+
+              <div className="flex items-center gap-4 mt-auto">
                 {product.affiliateUrl ? (
-                  <a 
-                    href={product.affiliateUrl} 
-                    target="_blank" 
+                  <a
+                    href={product.affiliateUrl}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="px-6 py-2 md:px-8 md:py-3 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition flex items-center gap-2 shadow-lg text-sm md:text-base"
+                    className="px-8 py-3 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition flex items-center gap-2 shadow-lg text-base"
                   >
-                    Ver Oferta <ExternalLink size={16}/>
+                    Ver Oferta <ExternalLink size={18} />
                   </a>
                 ) : (
-                  <Link 
+                  <Link
                     to={`/product/${product.id}`}
-                    className="px-6 py-2 md:px-8 md:py-3 bg-gray-900 text-white font-bold rounded-full hover:bg-black transition shadow-lg text-sm md:text-base"
+                    className="px-8 py-3 bg-gray-900 text-white font-bold rounded-full hover:bg-black transition shadow-lg text-base"
                   >
                     Comprar Agora
                   </Link>
                 )}
-                
-                <span className="text-xl md:text-2xl font-bold text-pink-600">
+
+                <span className="text-2xl font-bold text-pink-600">
                   R$ {product.price?.toFixed(2)}
                 </span>
               </div>
             </div>
 
-            {/* LADO DIREITO: IMAGEM */}
-            <div className="w-full md:w-1/2 h-full relative">
-                <img 
-                  src={product.imgUrl} 
-                  alt={product.name} 
-                  className="w-full h-full object-cover object-center"
-                />
-                {/* Degradê suave para mobile */}
-                <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent md:hidden"></div>
-            </div>
+            {/* IMAGEM (DESKTOP + MOBILE) */}
+            {/* No MOBILE: só a imagem clicável levando para os detalhes */}
+            <Link
+              to={`/product/${product.id}`}
+              className="w-full md:w-1/2 h-full relative block"
+            >
+              <img
+                src={product.imgUrl}
+                alt={product.name}
+                className="w-full h-full object-cover object-center"
+              />
+
+              {/* Badge no topo para mobile */}
+              <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-pink-600/90 text-[11px] font-bold text-white md:hidden">
+                Destaque do dia
+              </div>
+
+              {/* Nome + preço sobre a imagem no MOBILE */}
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent md:hidden">
+                <div className="text-sm font-semibold text-white truncate">
+                  {product.name}
+                </div>
+                <div className="text-xs text-pink-100 font-bold">
+                  R$ {product.price?.toFixed(2)}
+                </div>
+              </div>
+            </Link>
           </div>
         ))}
       </div>
 
       {/* BOTÕES DE NAVEGAÇÃO */}
-      <button onClick={prevSlide} className="absolute top-1/2 left-2 md:left-4 -translate-y-1/2 z-30 p-2 rounded-full bg-white/50 hover:bg-white text-gray-800 shadow-lg transition backdrop-blur-sm">
+      <button
+        onClick={prevSlide}
+        className="absolute top-1/2 left-2 md:left-4 -translate-y-1/2 z-30 p-2 rounded-full bg-white/50 hover:bg-white text-gray-800 shadow-lg transition backdrop-blur-sm"
+      >
         <ChevronLeft size={20} />
       </button>
-      <button onClick={nextSlide} className="absolute top-1/2 right-2 md:right-4 -translate-y-1/2 z-30 p-2 rounded-full bg-white/50 hover:bg-white text-gray-800 shadow-lg transition backdrop-blur-sm">
+      <button
+        onClick={nextSlide}
+        className="absolute top-1/2 right-2 md:right-4 -translate-y-1/2 z-30 p-2 rounded-full bg-white/50 hover:bg-white text-gray-800 shadow-lg transition backdrop-blur-sm"
+      >
         <ChevronRight size={20} />
       </button>
 
@@ -102,7 +129,11 @@ export default function FeaturedCarousel({ products }) {
           <button
             key={idx}
             onClick={() => setCurrent(idx)}
-            className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all ${idx === current ? 'bg-pink-600 w-6 md:w-8' : 'bg-gray-300 hover:bg-gray-400'}`}
+            className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all ${
+              idx === current
+                ? 'bg-pink-600 w-6 md:w-8'
+                : 'bg-gray-300 hover:bg-gray-400'
+            }`}
           />
         ))}
       </div>
