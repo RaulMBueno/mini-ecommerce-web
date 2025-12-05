@@ -1,30 +1,20 @@
 import axios from 'axios';
 
+// ⚠️ Troque a URL abaixo pela URL REAL do seu backend no Railway
+// (ex: https://mini-ecommerce-production-xxxxx.up.railway.app)
+const API_BASE_URL = 'https://mini-ecommerce-production-c2d9.up.railway.app';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080'
+  baseURL: API_BASE_URL,
 });
 
-// --- INTERCEPTOR COM LOGS DE DEPURAÇÃO ---
+// Anexa o token JWT em todas as requisições, se existir
 api.interceptors.request.use((config) => {
-  
-  // 1. Tenta ler o token
   const token = localStorage.getItem('miniecommerce_token');
-  
-  console.log("--- DEBUG API.JS ---");
-  console.log("URL Chamada:", config.url);
-  
   if (token) {
-    // 2. Se achou, anexa e avisa
     config.headers.Authorization = `Bearer ${token}`;
-    console.log("✅ Token anexado no header:", `Bearer ${token.substring(0, 10)}...`);
-  } else {
-    // 3. Se não achou, grita erro
-    console.warn("❌ NENHUM TOKEN ENCONTRADO no localStorage!");
   }
-  
   return config;
-}, (error) => {
-  return Promise.reject(error);
 });
 
 export default api;
