@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShoppingCart,
@@ -22,7 +22,6 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [allProducts, setAllProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
@@ -55,7 +54,6 @@ export default function Home() {
       const productsData = productsRes.data.content || productsRes.data;
 
       setAllProducts(productsData);
-      setFilteredProducts(productsData);
       setCategories(categoriesRes.data);
       setLoading(false);
     } catch (error) {
@@ -66,17 +64,24 @@ export default function Home() {
 
   const filterBy = (categoryId) => {
     setSelectedCategory(categoryId);
-    if (categoryId === 'all') {
-      setFilteredProducts(allProducts);
-    } else {
-      const result = allProducts.filter((product) =>
-        product.categories?.some((cat) => cat.id === categoryId)
-      );
-      setFilteredProducts(result);
-    }
   };
 
-  const featuredProducts = allProducts.filter((p) => p.isFeatured === true);
+  // Lista de produtos filtrada (derivada de allProducts + selectedCategory)
+  const filteredProducts = useMemo(() => {
+    if (selectedCategory === 'all') {
+      return allProducts;
+    }
+
+    return allProducts.filter((product) =>
+      product.categories?.some((cat) => cat.id === selectedCategory)
+    );
+  }, [allProducts, selectedCategory]);
+
+  // Produtos em destaque (também derivado, mas independente de filtro de categoria)
+  const featuredProducts = useMemo(
+    () => allProducts.filter((p) => p.isFeatured === true),
+    [allProducts]
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
