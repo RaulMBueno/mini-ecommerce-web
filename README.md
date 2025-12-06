@@ -39,3 +39,11 @@ Este projeto consome a API do mini-ecommerce em Java/Spring Boot e está publica
    ```bash
    git clone https://github.com/RaulMBueno/mini-ecommerce-web.git
    cd mini-ecommerce-web
+
+2. Instale as dependências:
+
+    npm install
+
+3. Inicie o servidor de desenvolvimento:
+
+    npm run dev
