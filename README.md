@@ -1,16 +1,41 @@
-# React + Vite
+# Makeup E-commerce – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend em React para uma loja virtual de produtos de beleza/maquiagem.  
+Este projeto consome a API do mini-ecommerce em Java/Spring Boot e está publicado em produção na Vercel.
 
-Currently, two official plugins are available:
+## ✨ Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Catálogo de produtos com imagem, nome e preço;
+- Organização por categorias;
+- Página de detalhes do produto;
+- Suporte a diferentes tipos de produto:
+  - produtos físicos;
+  - produtos via link de afiliado;
+  - produtos digitais (em expansão);
+- Redirecionamento seguro para links externos de afiliado;
+- Layout responsivo pensado para mobile e desktop.
 
-## React Compiler
+> Observação: nesta fase do projeto o foco principal está nos **produtos via link de afiliado**.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠 Tecnologias utilizadas
 
-## Expanding the ESLint configuration
+- React com Vite;
+- React Router DOM;
+- Axios (ou outra lib de HTTP utilizada no projeto);
+- Tailwind CSS (ou o sistema de estilos que você estiver usando);
+- Deploy na Vercel.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Como executar o projeto localmente
+
+### Pré-requisitos
+
+- Node.js 18+;
+- npm ou yarn.
+
+### Passos
+
+1. Clone o repositório:
+
+   ```bash
+   git clone https://github.com/RaulMBueno/mini-ecommerce-web.git
+   cd mini-ecommerce-web
