@@ -17,6 +17,15 @@ import api from '../api';
 import FeaturedCarousel from '../components/FeaturedCarousel';
 import ProductCard from '../components/ProductCard';
 
+// Normaliza texto: remove acentos e deixa minúsculo
+function normalizeText(text) {
+  if (!text) return '';
+  return text
+    .normalize('NFD') // separa letra e acento
+    .replace(/[\u0300-\u036f]/g, '') // remove os acentos
+    .toLowerCase();
+}
+
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -24,6 +33,7 @@ export default function Home() {
   const [allProducts, setAllProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -66,18 +76,44 @@ export default function Home() {
     setSelectedCategory(categoryId);
   };
 
-  // Lista de produtos filtrada (derivada de allProducts + selectedCategory)
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  // Lista de produtos filtrada (categoria + busca)
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === 'all') {
-      return allProducts;
+    let products = allProducts;
+
+    // Filtro por categoria
+    if (selectedCategory !== 'all') {
+      products = products.filter((product) =>
+        product.categories?.some((cat) => cat.id === selectedCategory)
+      );
     }
 
-    return allProducts.filter((product) =>
-      product.categories?.some((cat) => cat.id === selectedCategory)
-    );
-  }, [allProducts, selectedCategory]);
+    // Filtro por termo de busca (nome / descrição / categorias), ignorando acentos
+    const term = normalizeText(searchTerm.trim());
+    if (term) {
+      products = products.filter((product) => {
+        const name = normalizeText(product.name);
+        const description = normalizeText(product.description);
 
-  // Produtos em destaque (também derivado, mas independente de filtro de categoria)
+        const categoriesNames = (product.categories || [])
+          .map((cat) => normalizeText(cat.name))
+          .join(' ');
+
+        return (
+          name.includes(term) ||
+          description.includes(term) ||
+          categoriesNames.includes(term)
+        );
+      });
+    }
+
+    return products;
+  }, [allProducts, selectedCategory, searchTerm]);
+
+  // Produtos em destaque (independente da busca/categoria)
   const featuredProducts = useMemo(
     () => allProducts.filter((p) => p.isFeatured === true),
     [allProducts]
@@ -106,6 +142,8 @@ export default function Home() {
                 <input
                   type="text"
                   placeholder="O que você procura?"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
                   className="pl-10 pr-4 py-2 bg-gray-100 border-transparent rounded-full focus:bg-white focus:border-pink-300 focus:ring-2 focus:ring-pink-200 w-72 transition-all outline-none"
                 />
                 <Search className="h-5 w-5 text-gray-400 absolute left-3 top-2.5 group-focus-within:text-pink-500 transition-colors" />
@@ -165,7 +203,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* MENU MOBILE (login + link admin + categorias rápidas) */}
+        {/* MENU MOBILE (login + link admin) */}
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-100">
             <div className="px-4 py-3 space-y-3">
@@ -293,7 +331,7 @@ export default function Home() {
             ))}
           </div>
 
-          {/* CARROSSEL DESTAQUES (com hero dentro) */}
+          {/* CARROSSEL DESTAQUES */}
           {featuredProducts.length > 0 && (
             <div className="mb-6 md:mb-12">
               <div className="flex items-center gap-3 mb-4 md:mb-6">
@@ -335,7 +373,7 @@ export default function Home() {
                     Nenhum produto encontrado.
                   </p>
                   <p className="text-gray-400 text-xs md:text-sm">
-                    Tente selecionar outra categoria.
+                    Tente selecionar outra categoria ou alterar a busca.
                   </p>
                 </div>
               ) : (
