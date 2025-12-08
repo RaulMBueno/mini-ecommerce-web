@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShoppingCart,
@@ -17,22 +17,42 @@ import api from '../api';
 import FeaturedCarousel from '../components/FeaturedCarousel';
 import ProductCard from '../components/ProductCard';
 
-// Normaliza texto: remove acentos e deixa minúsculo
-function normalizeText(text) {
-  if (!text) return '';
-  return text
-    .normalize('NFD') // separa letra e acento
-    .replace(/[\u0300-\u036f]/g, '') // remove os acentos
-    .toLowerCase();
-}
+// Normaliza texto para busca e comparação (sem acento, minúsculo)
+const normalizeText = (text) =>
+  (text || '')
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
+// Gera uma sigla automática para a marca (ex: "Bruna Tavares" -> "BT")
+const getBrandShortLabel = (name) => {
+  if (!name) return '?';
+  const parts = name.trim().split(' ').filter(Boolean);
+
+  if (parts.length === 1) {
+    // Se só tem uma palavra, pega até 3 letras dela
+    return parts[0].substring(0, 3).toUpperCase();
+  }
+
+  // Se tem mais de uma, usa inicial da primeira e da última
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  const [brands, setBrands] = useState([]);
+  const [selectedBrand, setSelectedBrand] = useState('all');
+
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -56,15 +76,18 @@ export default function Home() {
 
   const fetchData = async () => {
     try {
-      const [productsRes, categoriesRes] = await Promise.all([
+      const [productsRes, categoriesRes, brandsRes] = await Promise.all([
         api.get('/products'),
         api.get('/categories'),
+        api.get('/brands'),
       ]);
 
       const productsData = productsRes.data.content || productsRes.data;
 
       setAllProducts(productsData);
+      setFilteredProducts(productsData);
       setCategories(categoriesRes.data);
+      setBrands(brandsRes.data || []);
       setLoading(false);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
@@ -72,52 +95,66 @@ export default function Home() {
     }
   };
 
+  // Só controla a categoria selecionada. O filtro em si é feito no useEffect abaixo.
   const filterBy = (categoryId) => {
     setSelectedCategory(categoryId);
   };
 
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
+  const handleBrandClick = (brandName) => {
+    setSelectedBrand((prev) =>
+      normalizeText(prev) === normalizeText(brandName) ? 'all' : brandName
+    );
   };
 
-  // Lista de produtos filtrada (categoria + busca)
-  const filteredProducts = useMemo(() => {
-    let products = allProducts;
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Combina filtros: categoria + marca + busca
+  useEffect(() => {
+    let result = [...allProducts];
 
     // Filtro por categoria
     if (selectedCategory !== 'all') {
-      products = products.filter((product) =>
+      result = result.filter((product) =>
         product.categories?.some((cat) => cat.id === selectedCategory)
       );
     }
 
-    // Filtro por termo de busca (nome / descrição / categorias), ignorando acentos
-    const term = normalizeText(searchTerm.trim());
-    if (term) {
-      products = products.filter((product) => {
-        const name = normalizeText(product.name);
-        const description = normalizeText(product.description);
+    // Filtro por marca (usando o campo "brand" do produto)
+    if (selectedBrand !== 'all') {
+      const selectedBrandNorm = normalizeText(selectedBrand);
+      result = result.filter((product) => {
+        const brandNorm = normalizeText(product.brand);
+        return brandNorm === selectedBrandNorm;
+      });
+    }
 
-        const categoriesNames = (product.categories || [])
-          .map((cat) => normalizeText(cat.name))
+    // Filtro por busca (nome, descrição, marca, categorias)
+    if (searchTerm.trim() !== '') {
+      const queryNorm = normalizeText(searchTerm);
+
+      result = result.filter((product) => {
+        const nameNorm = normalizeText(product.name);
+        const descNorm = normalizeText(product.description);
+        const brandNorm = normalizeText(product.brand);
+        const catsNorm = (product.categories || [])
+          .map((c) => normalizeText(c.name))
           .join(' ');
 
         return (
-          name.includes(term) ||
-          description.includes(term) ||
-          categoriesNames.includes(term)
+          nameNorm.includes(queryNorm) ||
+          descNorm.includes(queryNorm) ||
+          brandNorm.includes(queryNorm) ||
+          catsNorm.includes(queryNorm)
         );
       });
     }
 
-    return products;
-  }, [allProducts, selectedCategory, searchTerm]);
+    setFilteredProducts(result);
+  }, [allProducts, selectedCategory, selectedBrand, searchTerm]);
 
-  // Produtos em destaque (independente da busca/categoria)
-  const featuredProducts = useMemo(
-    () => allProducts.filter((p) => p.isFeatured === true),
-    [allProducts]
-  );
+  const featuredProducts = allProducts.filter((p) => p.isFeatured === true);
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
@@ -331,9 +368,9 @@ export default function Home() {
             ))}
           </div>
 
-          {/* CARROSSEL DESTAQUES */}
+          {/* CARROSSEL DESTAQUES (com hero dentro) */}
           {featuredProducts.length > 0 && (
-            <div className="mb-6 md:mb-12">
+            <div className="mb-6 md:mb-8">
               <div className="flex items-center gap-3 mb-4 md:mb-6">
                 <div className="h-8 w-1 bg-pink-600 rounded-full" />
                 <h2 className="text-xl md:text-2xl font-bold text-gray-800">
@@ -344,10 +381,76 @@ export default function Home() {
             </div>
           )}
 
+          {/* FAIXA DE MARCAS (logo-style) - agora usando /brands do backend */}
+          {brands.length > 0 && (
+            <div className="mb-6 md:mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Comprar por marca
+                  </span>
+                </div>
+                {selectedBrand !== 'all' && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedBrand('all')}
+                    className="text-xs text-pink-600 hover:underline"
+                  >
+                    Limpar filtro
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start pb-2">
+                {brands.map((brand) => {
+                  const isActive =
+                    normalizeText(selectedBrand) ===
+                    normalizeText(brand.name);
+                  const shortLabel = getBrandShortLabel(brand.name);
+
+                  return (
+                    <button
+                      key={brand.id}
+                      type="button"
+                      onClick={() => handleBrandClick(brand.name)}
+                      className={`flex flex-col items-center flex-shrink-0 ${
+                        isActive ? 'text-pink-600' : 'text-gray-600'
+                      }`}
+                    >
+                      <div
+                        className={`w-14 h-14 rounded-full border bg-white flex items-center justify-center text-xs font-semibold uppercase shadow-sm hover:shadow-md transition-all ${
+                          isActive
+                            ? 'border-pink-500 ring-2 ring-pink-200'
+                            : 'border-gray-200'
+                        }`}
+                      >
+                        {brand.logoUrl ? (
+                          <img
+                            src={brand.logoUrl}
+                            alt={brand.name}
+                            className="w-10 h-10 rounded-full object-contain"
+                          />
+                        ) : (
+                          <span className="px-1 text-[11px] text-center">
+                            {shortLabel}
+                          </span>
+                        )}
+                      </div>
+                      <span className="mt-1 text-[11px] font-medium truncate max-w-[70px]">
+                        {brand.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Título da vitrine */}
           <div className="flex items-center justify-between mb-4 md:mb-6">
             <h2 className="text-lg md:text-xl font-bold text-gray-800">
-              {selectedCategory === 'all'
+              {selectedBrand !== 'all'
+                ? `Marca: ${selectedBrand}`
+                : selectedCategory === 'all'
                 ? 'Vitrine Completa'
                 : categories.find((c) => c.id === selectedCategory)?.name ||
                   'Produtos'}
@@ -373,7 +476,8 @@ export default function Home() {
                     Nenhum produto encontrado.
                   </p>
                   <p className="text-gray-400 text-xs md:text-sm">
-                    Tente selecionar outra categoria ou alterar a busca.
+                    Tente selecionar outra categoria, marca ou buscar por outro
+                    termo.
                   </p>
                 </div>
               ) : (

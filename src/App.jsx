@@ -5,6 +5,7 @@ import Admin from './pages/Admin';
 import Login from './pages/Login';
 import ProductDetails from './pages/ProductDetails';
 import CategoriesAdmin from './pages/CategoriesAdmin';
+import BrandsAdmin from './pages/BrandsAdmin';
 
 export default function App() {
   return (
@@ -14,7 +15,7 @@ export default function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin/categories" element={<CategoriesAdmin />} />
-        {/* Rota de Detalhes */}
+        <Route path="/admin/brands" element={<BrandsAdmin />} />
         <Route path="/product/:id" element={<ProductDetails />} />
       </Routes>
     </BrowserRouter>
