@@ -17,18 +17,6 @@ import api from '../api';
 import FeaturedCarousel from '../components/FeaturedCarousel';
 import ProductCard from '../components/ProductCard';
 
-// Marcas em destaque (pode ajustar nomes e "siglas" depois)
-const FEATURED_BRANDS = [
-  { name: 'Bruna Tavares', shortLabel: 'BT' },
-  { name: 'Pri Lessa', shortLabel: 'PL' },
-  { name: 'Melu', shortLabel: 'Melu' },
-  { name: 'Ruby Rose', shortLabel: 'RR' },
-  { name: 'Bitarra', shortLabel: 'Bitarra' },
-  { name: 'Makiê', shortLabel: 'Makiê' },
-  { name: 'Boca Rosa', shortLabel: 'BR' },
-  { name: 'Vizzela', shortLabel: 'Vizzela' },
-];
-
 // Normaliza texto para busca e comparação (sem acento, minúsculo)
 const normalizeText = (text) =>
   (text || '')
@@ -37,6 +25,18 @@ const normalizeText = (text) =>
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
+
+// Gera iniciais para fallback do logo (ex: "Bruna Tavares" -> "BT")
+const getInitials = (name) => {
+  if (!name) return '?';
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 3)
+    .toUpperCase();
+};
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,12 +49,14 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const [selectedBrand, setSelectedBrand] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [brands, setBrands] = useState([]);
 
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
+    fetchBrands();
     checkLogin();
   }, []);
 
@@ -77,8 +79,8 @@ export default function Home() {
         api.get('/products', {
           params: {
             page: 0,
-            size: 1000, // pega até 1000 produtos (evita sumir depois de 20)
-            sort: 'id,desc', // mais novos primeiro
+            size: 1000, // pega até 1000 produtos (evita “sumir” depois de 20)
+            sort: 'id,desc',
           },
         }),
         api.get('/categories'),
@@ -93,6 +95,16 @@ export default function Home() {
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       setLoading(false);
+    }
+  };
+
+  const fetchBrands = async () => {
+    try {
+      const res = await api.get('/brands');
+      setBrands(res.data || []);
+    } catch (error) {
+      console.error('Erro ao carregar marcas:', error);
+      setBrands([]);
     }
   };
 
@@ -382,56 +394,69 @@ export default function Home() {
             </div>
           )}
 
-          {/* FAIXA DE MARCAS (logo-style simples com texto) */}
-          <div className="mb-6 md:mb-8">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Comprar por marca
-                </span>
-              </div>
-              {selectedBrand !== 'all' && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedBrand('all')}
-                  className="text-xs text-pink-600 hover:underline"
-                >
-                  Limpar filtro
-                </button>
-              )}
-            </div>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide justify-center md:justify-start">
-              {FEATURED_BRANDS.map((brand) => {
-                const isActive =
-                  normalizeText(selectedBrand) === normalizeText(brand.name);
-                return (
+          {/* FAIXA DE MARCAS (agora usando logos do backend) */}
+          {brands.length > 0 && (
+            <div className="mb-6 md:mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Comprar por marca
+                  </span>
+                </div>
+                {selectedBrand !== 'all' && (
                   <button
-                    key={brand.name}
                     type="button"
-                    onClick={() => handleBrandClick(brand.name)}
-                    className={`flex flex-col items-center flex-shrink-0 ${
-                      isActive ? 'text-pink-600' : 'text-gray-600'
-                    }`}
+                    onClick={() => setSelectedBrand('all')}
+                    className="text-xs text-pink-600 hover:underline"
                   >
-                    <div
-                      className={`w-14 h-14 rounded-full border bg-white flex items-center justify-center text-xs font-semibold uppercase shadow-sm hover:shadow-md transition-all ${
-                        isActive
-                          ? 'border-pink-500 ring-2 ring-pink-200'
-                          : 'border-gray-200'
+                    Limpar filtro
+                  </button>
+                )}
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide justify-center md:justify-start">
+                {brands.map((brand) => {
+                  const isActive =
+                    normalizeText(selectedBrand) ===
+                    normalizeText(brand.name);
+                  const initials = getInitials(brand.name);
+
+                  return (
+                    <button
+                      key={brand.id}
+                      type="button"
+                      onClick={() => handleBrandClick(brand.name)}
+                      className={`flex flex-col items-center flex-shrink-0 ${
+                        isActive ? 'text-pink-600' : 'text-gray-600'
                       }`}
                     >
-                      <span className="px-1 text-[11px] text-center">
-                        {brand.shortLabel}
+                      <div
+                        className={`w-14 h-14 rounded-full border bg-white flex items-center justify-center shadow-sm hover:shadow-md transition-all overflow-hidden ${
+                          isActive
+                            ? 'border-pink-500 ring-2 ring-pink-200'
+                            : 'border-gray-200'
+                        }`}
+                      >
+                        {brand.logoUrl ? (
+                          <img
+                            src={brand.logoUrl}
+                            alt={brand.name}
+                            className="w-10 h-10 object-contain"
+                          />
+                        ) : (
+                          <span className="px-1 text-[11px] text-center font-semibold uppercase">
+                            {initials}
+                          </span>
+                        )}
+                      </div>
+                      <span className="mt-1 text-[11px] font-medium truncate max-w-[70px]">
+                        {brand.name}
                       </span>
-                    </div>
-                    <span className="mt-1 text-[11px] font-medium truncate max-w-[70px]">
-                      {brand.name}
-                    </span>
-                  </button>
-                );
-              })}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Título da vitrine */}
           <div className="flex items-center justify-between mb-4 md:mb-6">
