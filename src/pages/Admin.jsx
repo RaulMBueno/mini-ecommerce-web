@@ -30,9 +30,6 @@ export default function Admin() {
     isFeatured: false,
   });
 
-  // 👇 NOVO: controlar filtro "apenas produtos sem marca"
-  const [showOnlyWithoutBrand, setShowOnlyWithoutBrand] = useState(false);
-
   useEffect(() => {
     loadProducts();
     loadCategories();
@@ -41,7 +38,13 @@ export default function Admin() {
 
   const loadProducts = async () => {
     try {
-      const response = await api.get('/products');
+      const response = await api.get('/products', {
+        params: {
+          page: 0,
+          size: 1000, // evita o limite padrão de 20
+          sort: 'id,desc', // mais novos primeiro
+        },
+      });
       setProducts(response.data.content || response.data);
     } catch (error) {
       console.error('Erro ao carregar produtos:', error);
@@ -333,7 +336,10 @@ export default function Admin() {
                 htmlFor="isFeatured"
                 className="text-gray-700 font-bold cursor-pointer select-none flex items-center gap-2"
               >
-                <Star size={18} className="text-yellow-500 fill-yellow-500" />
+                <Star
+                  size={18}
+                  className="text-yellow-500 fill-yellow-500"
+                />
                 Destacar este produto no Carrossel da Home
               </label>
             </div>
@@ -369,27 +375,9 @@ export default function Admin() {
 
         {/* Tabela de produtos */}
         <div className="bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+          <h2 className="text-xl font-semibold mb-6 text-gray-800">
             Gerenciar Produtos
           </h2>
-
-          {/* Filtro de produtos sem marca */}
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-gray-500">
-              Total: {products.length} produtos
-            </span>
-
-            <label className="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-              <input
-                type="checkbox"
-                className="w-4 h-4 accent-pink-600 cursor-pointer"
-                checked={showOnlyWithoutBrand}
-                onChange={(e) => setShowOnlyWithoutBrand(e.target.checked)}
-              />
-              <span>Mostrar apenas produtos sem marca</span>
-            </label>
-          </div>
-
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -397,20 +385,16 @@ export default function Admin() {
                   <th className="py-3">Img</th>
                   <th className="py-3">Nome</th>
                   <th className="py-3">Preço</th>
-                  <th className="py-3">Marca</th>
                   <th className="py-3">Destaque?</th>
                   <th className="py-3 text-right">Ações</th>
                 </tr>
               </thead>
               <tbody>
-                {(
-                  showOnlyWithoutBrand
-                    ? products.filter(
-                        (p) => !p.brand || p.brand.trim() === '',
-                      )
-                    : products
-                ).map((product) => (
-                  <tr key={product.id} className="border-b hover:bg-gray-50">
+                {products.map((product) => (
+                  <tr
+                    key={product.id}
+                    className="border-b hover:bg-gray-50"
+                  >
                     <td className="py-3">
                       <img
                         src={
@@ -423,11 +407,6 @@ export default function Admin() {
                     <td className="py-3 font-medium">{product.name}</td>
                     <td className="py-3">
                       R$ {product.price?.toFixed(2)}
-                    </td>
-                    <td className="py-3 text-sm text-gray-600">
-                      {product.brand && product.brand.trim() !== ''
-                        ? product.brand
-                        : '— sem marca —'}
                     </td>
                     <td className="py-3">
                       {product.isFeatured && (
