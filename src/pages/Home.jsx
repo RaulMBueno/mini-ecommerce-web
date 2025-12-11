@@ -17,6 +17,19 @@ import api from '../api';
 import FeaturedCarousel from '../components/FeaturedCarousel';
 import ProductCard from '../components/ProductCard';
 
+// Map com siglas personalizadas (opcional)
+const BRAND_SHORT_LABELS = {
+  'bruna tavares': 'BT',
+  'pri lessa': 'PL',
+  'melu': 'Melu',
+  'ruby rose': 'RR',
+  'bitarra': 'Bitarra',
+  'makiê': 'Makiê',
+  'makie': 'Makiê',
+  'boca rosa': 'BR',
+  'vizzela': 'Vizzela',
+};
+
 // Normaliza texto para busca e comparação (sem acento, minúsculo)
 const normalizeText = (text) =>
   (text || '')
@@ -26,16 +39,29 @@ const normalizeText = (text) =>
     .toLowerCase()
     .trim();
 
-// Gera iniciais para fallback do logo (ex: "Bruna Tavares" -> "BT")
-const getInitials = (name) => {
-  if (!name) return '?';
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 3)
-    .toUpperCase();
+// Gera sigla padrão caso não tenha no mapa acima
+const getShortLabel = (name) => {
+  if (!name) return '';
+
+  const norm = normalizeText(name);
+  if (BRAND_SHORT_LABELS[norm]) return BRAND_SHORT_LABELS[norm];
+
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) {
+    return parts[0].substring(0, 3).toUpperCase();
+  }
+  // Primeira letra do primeiro + primeira letra do último
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
+// Monta URL completa da logo (se vier relativa, tipo "/uploads/...")
+const resolveLogoUrl = (logoUrl) => {
+  if (!logoUrl) return null;
+  if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+    return logoUrl;
+  }
+  const base = api.defaults.baseURL || '';
+  return `${base}${logoUrl}`;
 };
 
 export default function Home() {
@@ -46,17 +72,16 @@ export default function Home() {
   const [filteredProducts, setFilteredProducts] = useState([]);
 
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-
-  const [selectedBrand, setSelectedBrand] = useState('all');
   const [brands, setBrands] = useState([]);
 
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedBrand, setSelectedBrand] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
-    fetchBrands();
     checkLogin();
   }, []);
 
@@ -75,36 +100,22 @@ export default function Home() {
 
   const fetchData = async () => {
     try {
-      const [productsRes, categoriesRes] = await Promise.all([
-        api.get('/products', {
-          params: {
-            page: 0,
-            size: 1000, // pega até 1000 produtos (evita “sumir” depois de 20)
-            sort: 'id,desc',
-          },
-        }),
+      const [productsRes, categoriesRes, brandsRes] = await Promise.all([
+        api.get('/products'),
         api.get('/categories'),
+        api.get('/brands'),
       ]);
 
       const productsData = productsRes.data.content || productsRes.data;
 
       setAllProducts(productsData);
       setFilteredProducts(productsData);
-      setCategories(categoriesRes.data);
+      setCategories(categoriesRes.data || categoriesRes.data);
+      setBrands(brandsRes.data || []);
       setLoading(false);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       setLoading(false);
-    }
-  };
-
-  const fetchBrands = async () => {
-    try {
-      const res = await api.get('/brands');
-      setBrands(res.data || []);
-    } catch (error) {
-      console.error('Erro ao carregar marcas:', error);
-      setBrands([]);
     }
   };
 
@@ -143,7 +154,7 @@ export default function Home() {
       });
     }
 
-    // Filtro por busca (nome, descrição, marca)
+    // Filtro por busca (nome, descrição, marca, categorias)
     if (searchTerm.trim() !== '') {
       const queryNorm = normalizeText(searchTerm);
 
@@ -394,69 +405,70 @@ export default function Home() {
             </div>
           )}
 
-          {/* FAIXA DE MARCAS (agora usando logos do backend) */}
-          {brands.length > 0 && (
-            <div className="mb-6 md:mb-8">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Comprar por marca
-                  </span>
-                </div>
-                {selectedBrand !== 'all' && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedBrand('all')}
-                    className="text-xs text-pink-600 hover:underline"
-                  >
-                    Limpar filtro
-                  </button>
-                )}
+          {/* FAIXA DE MARCAS (logo-style) */}
+          <div className="mb-6 md:mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Comprar por marca
+                </span>
               </div>
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide justify-center md:justify-start">
-                {brands.map((brand) => {
-                  const isActive =
-                    normalizeText(selectedBrand) ===
-                    normalizeText(brand.name);
-                  const initials = getInitials(brand.name);
+              {selectedBrand !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedBrand('all')}
+                  className="text-xs text-pink-600 hover:underline"
+                >
+                  Limpar filtro
+                </button>
+              )}
+            </div>
 
-                  return (
-                    <button
-                      key={brand.id}
-                      type="button"
-                      onClick={() => handleBrandClick(brand.name)}
-                      className={`flex flex-col items-center flex-shrink-0 ${
-                        isActive ? 'text-pink-600' : 'text-gray-600'
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {brands.map((brand) => {
+                const isActive =
+                  normalizeText(selectedBrand) ===
+                  normalizeText(brand.name);
+
+                const logoUrl = resolveLogoUrl(brand.logoUrl);
+                const shortLabel = getShortLabel(brand.name);
+
+                return (
+                  <button
+                    key={brand.id}
+                    type="button"
+                    onClick={() => handleBrandClick(brand.name)}
+                    className={`flex flex-col items-center flex-shrink-0 ${
+                      isActive ? 'text-pink-600' : 'text-gray-600'
+                    }`}
+                  >
+                    <div
+                      className={`w-14 h-14 rounded-full border bg-white flex items-center justify-center text-xs font-semibold uppercase shadow-sm hover:shadow-md transition-all overflow-hidden ${
+                        isActive
+                          ? 'border-pink-500 ring-2 ring-pink-200'
+                          : 'border-gray-200'
                       }`}
                     >
-                      <div
-                        className={`w-14 h-14 rounded-full border bg-white flex items-center justify-center shadow-sm hover:shadow-md transition-all overflow-hidden ${
-                          isActive
-                            ? 'border-pink-500 ring-2 ring-pink-200'
-                            : 'border-gray-200'
-                        }`}
-                      >
-                        {brand.logoUrl ? (
-                          <img
-                            src={brand.logoUrl}
-                            alt={brand.name}
-                            className="w-10 h-10 object-contain"
-                          />
-                        ) : (
-                          <span className="px-1 text-[11px] text-center font-semibold uppercase">
-                            {initials}
-                          </span>
-                        )}
-                      </div>
-                      <span className="mt-1 text-[11px] font-medium truncate max-w-[70px]">
-                        {brand.name}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+                      {logoUrl ? (
+                        <img
+                          src={logoUrl}
+                          alt={brand.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="px-1 text-[11px] text-center">
+                          {shortLabel}
+                        </span>
+                      )}
+                    </div>
+                    <span className="mt-1 text-[11px] font-medium truncate max-w-[70px]">
+                      {brand.name}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-          )}
+          </div>
 
           {/* Título da vitrine */}
           <div className="flex items-center justify-between mb-4 md:mb-6">
