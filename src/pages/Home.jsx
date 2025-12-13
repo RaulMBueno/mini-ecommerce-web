@@ -80,6 +80,10 @@ export default function Home() {
 
   const [loading, setLoading] = useState(true);
 
+  // Paginação (front-end)
+  const [currentPage, setCurrentPage] = useState(0);
+  const PRODUCTS_PER_PAGE = 12; // quantos produtos por página
+
   useEffect(() => {
     fetchData();
     checkLogin();
@@ -101,11 +105,13 @@ export default function Home() {
   const fetchData = async () => {
     try {
       const [productsRes, categoriesRes, brandsRes] = await Promise.all([
-        api.get('/products', { params: { 
-          page: 0, 
-          size: 1000,
-          sort: 'id,asc',
-          } }),
+        api.get('/products', {
+          params: {
+            page: 0,
+            size: 1000,
+            sort: 'id,asc',
+          },
+        }),
         api.get('/categories'),
         api.get('/brands'),
       ]);
@@ -114,7 +120,7 @@ export default function Home() {
 
       setAllProducts(productsData);
       setFilteredProducts(productsData);
-      setCategories(categoriesRes.data || categoriesRes.data);
+      setCategories(categoriesRes.data || []);
       setBrands(brandsRes.data || []);
       setLoading(false);
     } catch (error) {
@@ -126,16 +132,19 @@ export default function Home() {
   // Só controla a categoria selecionada. O filtro em si é feito no useEffect abaixo.
   const filterBy = (categoryId) => {
     setSelectedCategory(categoryId);
+    setCurrentPage(0);
   };
 
   const handleBrandClick = (brandName) => {
     setSelectedBrand((prev) =>
       normalizeText(prev) === normalizeText(brandName) ? 'all' : brandName
     );
+    setCurrentPage(0);
   };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
+    setCurrentPage(0);
   };
 
   // Combina filtros: categoria + marca + busca
@@ -180,9 +189,26 @@ export default function Home() {
     }
 
     setFilteredProducts(result);
+    setCurrentPage(0);
   }, [allProducts, selectedCategory, selectedBrand, searchTerm]);
 
   const featuredProducts = allProducts.filter((p) => p.isFeatured === true);
+
+  // Paginação em memória (front-end)
+  const totalPages =
+    Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE) || 1;
+
+  const startIndex = currentPage * PRODUCTS_PER_PAGE;
+  const endIndex = startIndex + PRODUCTS_PER_PAGE;
+  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
+  const canGoPrev = currentPage > 0;
+  const canGoNext = currentPage < totalPages - 1;
+
+  const goToPage = (pageIndex) => {
+    if (pageIndex < 0 || pageIndex > totalPages - 1) return;
+    setCurrentPage(pageIndex);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
@@ -340,7 +366,9 @@ export default function Home() {
                   }`}
                 >
                   <span className="font-medium">{cat.name}</span>
-                  {selectedCategory === cat.id && <ChevronRight size={16} />}
+                  {selectedCategory === cat.id && (
+                    <ChevronRight size={16} />
+                  )}
                 </button>
               ))}
             </div>
@@ -489,32 +517,97 @@ export default function Home() {
             </span>
           </div>
 
-          {/* LISTA DE PRODUTOS */}
+          {/* LISTA DE PRODUTOS + PAGINAÇÃO */}
           {loading ? (
             <div className="flex justify-center items-center h-48 md:h-64 bg-white rounded-2xl shadow-sm">
               <Loader className="h-8 w-8 md:h-10 md:w-10 text-pink-600 animate-spin" />
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              {filteredProducts.length === 0 ? (
-                <div className="col-span-full text-center py-16 bg-white rounded-2xl border border-dashed border-gray-300">
-                  <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400">
-                    <Search size={24} />
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                {filteredProducts.length === 0 ? (
+                  <div className="col-span-full text-center py-16 bg-white rounded-2xl border border-dashed border-gray-300">
+                    <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400">
+                      <Search size={24} />
+                    </div>
+                    <p className="text-gray-500 text-base md:text-lg font-medium">
+                      Nenhum produto encontrado.
+                    </p>
+                    <p className="text-gray-400 text-xs md:text-sm">
+                      Tente selecionar outra categoria, marca ou buscar por
+                      outro termo.
+                    </p>
                   </div>
-                  <p className="text-gray-500 text-base md:text-lg font-medium">
-                    Nenhum produto encontrado.
-                  </p>
-                  <p className="text-gray-400 text-xs md:text-sm">
-                    Tente selecionar outra categoria, marca ou buscar por outro
-                    termo.
-                  </p>
+                ) : (
+                  paginatedProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))
+                )}
+              </div>
+
+              {/* Controles de paginação */}
+              {filteredProducts.length > 0 && totalPages > 1 && (
+                <div className="mt-6 flex flex-col items-center gap-3">
+                  <div className="text-xs text-gray-500">
+                    Mostrando{' '}
+                    <span className="font-semibold">
+                      {startIndex + 1}-
+                      {Math.min(endIndex, filteredProducts.length)}
+                    </span>{' '}
+                    de{' '}
+                    <span className="font-semibold">
+                      {filteredProducts.length}
+                    </span>{' '}
+                    produtos
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => goToPage(currentPage - 1)}
+                      disabled={!canGoPrev}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                        canGoPrev
+                          ? 'bg-white text-gray-700 hover:bg-gray-100'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      }`}
+                    >
+                      Anterior
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalPages }).map((_, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => goToPage(index)}
+                          className={`w-8 h-8 rounded-full text-xs font-semibold flex items-center justify-center border ${
+                            index === currentPage
+                              ? 'bg-pink-600 text-white border-pink-600'
+                              : 'bg-white text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => goToPage(currentPage + 1)}
+                      disabled={!canGoNext}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                        canGoNext
+                          ? 'bg-white text-gray-700 hover:bg-gray-100'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      }`}
+                    >
+                      Próxima
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))
               )}
-            </div>
+            </>
           )}
         </div>
       </div>
