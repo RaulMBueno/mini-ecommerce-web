@@ -80,9 +80,8 @@ export default function Home() {
 
   const [loading, setLoading] = useState(true);
 
-  // Paginação (front-end)
   const [currentPage, setCurrentPage] = useState(0);
-  const PRODUCTS_PER_PAGE = 12; // quantos produtos por página
+  const PRODUCTS_PER_PAGE = 12; // produtos por página na vitrine
 
   useEffect(() => {
     fetchData();
@@ -120,7 +119,7 @@ export default function Home() {
 
       setAllProducts(productsData);
       setFilteredProducts(productsData);
-      setCategories(categoriesRes.data || []);
+      setCategories(categoriesRes.data || categoriesRes.data);
       setBrands(brandsRes.data || []);
       setLoading(false);
     } catch (error) {
@@ -202,18 +201,10 @@ export default function Home() {
   const endIndex = startIndex + PRODUCTS_PER_PAGE;
   const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
 
-  const canGoPrev = currentPage > 0;
-  const canGoNext = currentPage < totalPages - 1;
-
-  const goToPage = (pageIndex) => {
-    if (pageIndex < 0 || pageIndex > totalPages - 1) return;
-    setCurrentPage(pageIndex);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
       {/* NAVBAR */}
-      <nav className="bg-white shadow-sm sticky top-0 z-50">
+      <nav className="bg-white shadow-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             {/* Logo */}
@@ -281,58 +272,173 @@ export default function Home() {
             {/* Botão Mobile Menu */}
             <div className="md:hidden flex items-center">
               <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                onClick={() => setIsMenuOpen(true)}
                 className="text-gray-600 hover:text-pink-600"
               >
-                {isMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
+                <Menu className="h-6 w-6" />
               </button>
             </div>
           </div>
         </div>
+      </nav>
 
-        {/* MENU MOBILE (login + link admin) */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100">
-            <div className="px-4 py-3 space-y-3">
-              {/* Login / Logout mobile */}
-              {isLoggedIn ? (
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-200 transition font-medium"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Sair</span>
-                </button>
-              ) : (
-                <Link
-                  to="/login"
-                  className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-full hover:bg-gray-800 transition font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <LogIn className="h-4 w-4" />
-                  <span>Entrar</span>
-                </Link>
-              )}
+      {/* MENU LATERAL MOBILE (categorias + marcas + login) */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Fundo escuro para fechar ao clicar */}
+          <div
+            className="absolute inset-0 bg-black bg-opacity-40"
+            onClick={() => setIsMenuOpen(false)}
+          />
 
-              {/* Link painel admin (se logado) */}
-              {isLoggedIn && (
-                <Link
-                  to="/admin"
-                  className="flex items-center gap-2 text-gray-700 font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <User size={18} />
-                  <span>Painel administrativo</span>
-                </Link>
-              )}
+          {/* Drawer lateral */}
+          <div className="relative h-full w-4/5 max-w-xs bg-white shadow-xl flex flex-col">
+            {/* Cabeçalho do menu */}
+            <div className="px-4 py-3 border-b flex items-center justify-between">
+              <span className="font-semibold text-gray-800">Menu</span>
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="text-gray-500 hover:text-pink-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              {/* Seção Login / Logout */}
+              <div className="px-4 py-3 border-b space-y-2">
+                {isLoggedIn ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-200 transition font-medium"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Sair</span>
+                    </button>
+
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-2 text-gray-700 font-medium text-sm mt-2"
+                    >
+                      <User size={18} />
+                      <span>Painel administrativo</span>
+                    </Link>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-full hover:bg-gray-800 transition font-medium"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    <span>Entrar</span>
+                  </Link>
+                )}
+              </div>
+
+              {/* Seção Categorias */}
+              <div className="px-4 py-4 border-b">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <Filter size={16} className="text-pink-600" />
+                  Categorias
+                </h3>
+
+                <div className="space-y-2">
+                  <button
+                    onClick={() => {
+                      filterBy('all');
+                      setSelectedBrand('all');
+                      setIsMenuOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
+                      selectedCategory === 'all'
+                        ? 'bg-pink-600 text-white'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    Todos os produtos
+                  </button>
+
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        filterBy(cat.id);
+                        setSelectedBrand('all');
+                        setIsMenuOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
+                        selectedCategory === cat.id
+                          ? 'bg-pink-600 text-white'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Seção Marcas */}
+              <div className="px-4 py-4">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">
+                  Marcas
+                </h3>
+                <div className="flex flex-wrap gap-3">
+                  {brands.map((brand) => {
+                    const isActive =
+                      normalizeText(selectedBrand) ===
+                      normalizeText(brand.name);
+
+                    const logoUrl = resolveLogoUrl(brand.logoUrl);
+                    const shortLabel = getShortLabel(brand.name);
+
+                    return (
+                      <button
+                        key={brand.id}
+                        type="button"
+                        onClick={() => {
+                          handleBrandClick(brand.name);
+                          setIsMenuOpen(false);
+                        }}
+                        className={`flex flex-col items-center ${
+                          isActive ? 'text-pink-600' : 'text-gray-600'
+                        }`}
+                      >
+                        <div
+                          className={`w-11 h-11 rounded-full border bg-white flex items-center justify-center text-[10px] font-semibold uppercase shadow-sm overflow-hidden ${
+                            isActive ? 'border-pink-500' : 'border-gray-200'
+                          }`}
+                        >
+                          {logoUrl ? (
+                            <img
+                              src={logoUrl}
+                              alt={brand.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="px-1 text-[10px] text-center">
+                              {shortLabel}
+                            </span>
+                          )}
+                        </div>
+                        <span className="mt-1 text-[10px] font-medium truncate max-w-[70px]">
+                          {brand.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
-        )}
-      </nav>
+        </div>
+      )}
 
       {/* CONTEÚDO PRINCIPAL */}
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-12 flex flex-col md:flex-row gap-8">
@@ -366,9 +472,7 @@ export default function Home() {
                   }`}
                 >
                   <span className="font-medium">{cat.name}</span>
-                  {selectedCategory === cat.id && (
-                    <ChevronRight size={16} />
-                  )}
+                  {selectedCategory === cat.id && <ChevronRight size={16} />}
                 </button>
               ))}
             </div>
@@ -517,98 +621,63 @@ export default function Home() {
             </span>
           </div>
 
-          {/* LISTA DE PRODUTOS + PAGINAÇÃO */}
+          {/* LISTA DE PRODUTOS */}
           {loading ? (
             <div className="flex justify-center items-center h-48 md:h-64 bg-white rounded-2xl shadow-sm">
               <Loader className="h-8 w-8 md:h-10 md:w-10 text-pink-600 animate-spin" />
             </div>
           ) : (
-            <>
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                {filteredProducts.length === 0 ? (
-                  <div className="col-span-full text-center py-16 bg-white rounded-2xl border border-dashed border-gray-300">
-                    <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400">
-                      <Search size={24} />
-                    </div>
-                    <p className="text-gray-500 text-base md:text-lg font-medium">
-                      Nenhum produto encontrado.
-                    </p>
-                    <p className="text-gray-400 text-xs md:text-sm">
-                      Tente selecionar outra categoria, marca ou buscar por
-                      outro termo.
-                    </p>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+              {filteredProducts.length === 0 ? (
+                <div className="col-span-full text-center py-16 bg-white rounded-2xl border border-dashed border-gray-300">
+                  <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400">
+                    <Search size={24} />
                   </div>
-                ) : (
-                  paginatedProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))
-                )}
-              </div>
-
-              {/* Controles de paginação */}
-              {filteredProducts.length > 0 && totalPages > 1 && (
-                <div className="mt-6 flex flex-col items-center gap-3">
-                  <div className="text-xs text-gray-500">
-                    Mostrando{' '}
-                    <span className="font-semibold">
-                      {startIndex + 1}-
-                      {Math.min(endIndex, filteredProducts.length)}
-                    </span>{' '}
-                    de{' '}
-                    <span className="font-semibold">
-                      {filteredProducts.length}
-                    </span>{' '}
-                    produtos
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={!canGoPrev}
-                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                        canGoPrev
-                          ? 'bg-white text-gray-700 hover:bg-gray-100'
-                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      }`}
-                    >
-                      Anterior
-                    </button>
-
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: totalPages }).map((_, index) => (
-                        <button
-                          key={index}
-                          type="button"
-                          onClick={() => goToPage(index)}
-                          className={`w-8 h-8 rounded-full text-xs font-semibold flex items-center justify-center border ${
-                            index === currentPage
-                              ? 'bg-pink-600 text-white border-pink-600'
-                              : 'bg-white text-gray-700 hover:bg-gray-100'
-                          }`}
-                        >
-                          {index + 1}
-                        </button>
-                      ))}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={!canGoNext}
-                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                        canGoNext
-                          ? 'bg-white text-gray-700 hover:bg-gray-100'
-                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      }`}
-                    >
-                      Próxima
-                    </button>
-                  </div>
+                  <p className="text-gray-500 text-base md:text-lg font-medium">
+                    Nenhum produto encontrado.
+                  </p>
+                  <p className="text-gray-400 text-xs md:text-sm">
+                    Tente selecionar outra categoria, marca ou buscar por outro
+                    termo.
+                  </p>
                 </div>
+              ) : (
+                paginatedProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))
               )}
-            </>
+            </div>
           )}
+
+          {/* Paginação (se quiser usar depois)
+              Exemplo simples:
+
+          {filteredProducts.length > 0 && (
+            <div className="flex justify-center items-center gap-2 mt-6">
+              <button
+                disabled={currentPage === 0}
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 0))}
+                className="px-3 py-1 text-xs rounded border disabled:opacity-40"
+              >
+                Anterior
+              </button>
+              <span className="text-xs text-gray-500">
+                Página {currentPage + 1} de {totalPages}
+              </span>
+              <button
+                disabled={currentPage + 1 >= totalPages}
+                onClick={() =>
+                  setCurrentPage((p) =>
+                    p + 1 < totalPages ? p + 1 : p
+                  )
+                }
+                className="px-3 py-1 text-xs rounded border disabled:opacity-40"
+              >
+                Próxima
+              </button>
+            </div>
+          )}
+          */}
         </div>
       </div>
     </div>
