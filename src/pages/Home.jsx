@@ -101,7 +101,11 @@ export default function Home() {
   const fetchData = async () => {
     try {
       const [productsRes, categoriesRes, brandsRes] = await Promise.all([
-        api.get('/products'),
+        api.get('/products', { params: { 
+          page: 0, 
+          size: 1000,
+          sort: 'id,asc',
+          } }),
         api.get('/categories'),
         api.get('/brands'),
       ]);
