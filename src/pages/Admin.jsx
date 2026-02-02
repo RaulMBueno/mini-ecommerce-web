@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import {
@@ -13,6 +13,13 @@ import {
 } from 'lucide-react';
 
 export default function Admin() {
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const PAGE_SIZE = 10;
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -31,25 +38,52 @@ export default function Admin() {
   });
 
   useEffect(() => {
-    loadProducts();
     loadCategories();
     loadBrands();
   }, []);
 
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     try {
       const response = await api.get('/products', {
         params: {
-          page: 0,
-          size: 1000, // evita o limite padrão de 20
-          sort: 'id,desc', // mais novos primeiro
+          page,
+          size: PAGE_SIZE,
+          sort: 'id,desc',
+          search: search || undefined,
         },
       });
-      setProducts(response.data.content || response.data);
+
+      const nextTotalPages = response.data.totalPages ?? 0;
+      const nextProducts = response.data.content || [];
+
+      setProducts(nextProducts);
+      setTotalPages(nextTotalPages);
+
+      if (nextTotalPages === 0 && page !== 0) {
+        setPage(0);
+        return;
+      }
+
+      if (nextTotalPages > 0 && page > nextTotalPages - 1) {
+        setPage(nextTotalPages - 1);
+      }
     } catch (error) {
       console.error('Erro ao carregar produtos:', error);
     }
-  };
+  }, [page, search]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setPage(0);
+      setSearch(searchInput.trim());
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchInput]);
+
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
 
   const loadCategories = async () => {
     try {
@@ -375,9 +409,29 @@ export default function Admin() {
 
         {/* Tabela de produtos */}
         <div className="bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-xl font-semibold mb-6 text-gray-800">
-            Gerenciar Produtos
-          </h2>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Gerenciar Produtos
+            </h2>
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <input
+                type="text"
+                placeholder="Buscar por nome..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="w-full md:w-72 p-2.5 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => setSearchInput('')}
+                  className="px-3 py-2 text-sm rounded-lg border text-gray-600 hover:bg-gray-50"
+                >
+                  Limpar
+                </button>
+              )}
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -439,6 +493,33 @@ export default function Admin() {
                 Nenhum produto cadastrado.
               </p>
             )}
+          </div>
+          <div className="flex items-center justify-between mt-6">
+            <span className="text-sm text-gray-500">
+              Página {totalPages === 0 ? 0 : page + 1} de {totalPages}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage((prev) => Math.max(0, prev - 1))}
+                disabled={page === 0 || totalPages === 0}
+                className="px-4 py-2 text-sm rounded-lg border text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                Anterior
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setPage((prev) =>
+                    prev + 1 < totalPages ? prev + 1 : prev
+                  )
+                }
+                disabled={page + 1 >= totalPages || totalPages === 0}
+                className="px-4 py-2 text-sm rounded-lg border text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                Próximo
+              </button>
+            </div>
           </div>
         </div>
       </div>
