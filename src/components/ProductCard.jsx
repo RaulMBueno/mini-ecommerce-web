@@ -14,18 +14,36 @@ export default function ProductCard({ product }) {
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full border border-gray-100 group">
       {/* IMAGEM */}
       <div className="relative overflow-hidden rounded-t-2xl">
-        <Link to={`/product/${product.id}`}>
-          <img
-            className="w-full h-40 sm:h-48 md:h-56 object-cover cursor-pointer group-hover:scale-110 transition duration-700"
-            src={
-              product.imgUrl
-                ? product.imgUrl
-                : 'https://via.placeholder.com/300x200?text=Sem+Imagem'
-            }
-            alt={product.name}
-            title="Clique para ver detalhes"
-          />
-        </Link>
+        {isAffiliate ? (
+          <a
+            href={product.affiliateUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Ir para o site parceiro"
+          >
+            <img
+              className="w-full h-40 sm:h-48 md:h-56 object-cover cursor-pointer group-hover:scale-110 transition duration-700"
+              src={
+                product.imgUrl
+                  ? product.imgUrl
+                  : 'https://via.placeholder.com/300x200?text=Sem+Imagem'
+              }
+              alt={product.name}
+            />
+          </a>
+        ) : (
+          <Link to={`/product/${product.id}`} title="Clique para ver detalhes">
+            <img
+              className="w-full h-40 sm:h-48 md:h-56 object-cover cursor-pointer group-hover:scale-110 transition duration-700"
+              src={
+                product.imgUrl
+                  ? product.imgUrl
+                  : 'https://via.placeholder.com/300x200?text=Sem+Imagem'
+              }
+              alt={product.name}
+            />
+          </Link>
+        )}
 
         {isAffiliate && (
           <span className="absolute top-3 right-3 bg-white/90 backdrop-blur text-purple-700 text-[11px] font-bold px-2 py-1 rounded-md shadow-sm">
@@ -44,9 +62,25 @@ export default function ProductCard({ product }) {
         </div>
 
         {/* Nome do produto */}
-        <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 mb-1.5 leading-tight group-hover:text-pink-600 transition line-clamp-2">
-          {product.name}
-        </h3>
+        {isAffiliate ? (
+          <a
+            href={product.affiliateUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm sm:text-base md:text-lg font-bold text-gray-900 mb-1.5 leading-tight group-hover:text-pink-600 transition line-clamp-2"
+            title="Ir para o site parceiro"
+          >
+            {product.name}
+          </a>
+        ) : (
+          <Link
+            to={`/product/${product.id}`}
+            className="text-sm sm:text-base md:text-lg font-bold text-gray-900 mb-1.5 leading-tight group-hover:text-pink-600 transition line-clamp-2"
+            title="Clique para ver detalhes"
+          >
+            {product.name}
+          </Link>
+        )}
 
         {/* Descrição curta (limitada) */}
         <p className="text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
@@ -67,14 +101,22 @@ export default function ProductCard({ product }) {
           </span>
 
           {isAffiliate ? (
-            <a
-              href={product.affiliateUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 sm:gap-2 bg-pink-50 text-pink-600 px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-xl hover:bg-pink-600 hover:text-white transition font-bold text-[11px] sm:text-sm"
-            >
-              Ver Oferta <ExternalLink size={14} />
-            </a>
+            <div className="flex flex-col items-end gap-2">
+              <a
+                href={product.affiliateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 sm:gap-2 bg-pink-50 text-pink-600 px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-xl hover:bg-pink-600 hover:text-white transition font-bold text-[11px] sm:text-sm"
+              >
+                Ver Oferta <ExternalLink size={14} />
+              </a>
+              <Link
+                to={`/product/${product.id}`}
+                className="text-[11px] sm:text-xs text-gray-600 hover:text-pink-600 underline"
+              >
+                Ver detalhes
+              </Link>
+            </div>
           ) : (
             <button className="p-2.5 sm:p-3 bg-gray-900 rounded-xl hover:bg-black text-white transition shadow-lg hover:shadow-gray-900/30">
               <ShoppingCart size={18} />

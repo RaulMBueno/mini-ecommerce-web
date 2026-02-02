@@ -121,14 +121,22 @@ export default function FeaturedCarousel({ products }) {
 
                 <div className="flex items-center gap-4 mt-auto">
                   {product.affiliateUrl ? (
-                    <a
-                      href={product.affiliateUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-8 py-3 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition flex items-center gap-2 shadow-lg text-base"
-                    >
-                      Ver Oferta <ExternalLink size={18} />
-                    </a>
+                    <div className="flex items-center gap-3">
+                      <a
+                        href={product.affiliateUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-8 py-3 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition flex items-center gap-2 shadow-lg text-base"
+                      >
+                        Ver Oferta <ExternalLink size={18} />
+                      </a>
+                      <Link
+                        to={`/product/${product.id}`}
+                        className="text-sm text-gray-600 hover:text-pink-600 underline"
+                      >
+                        Ver detalhes
+                      </Link>
+                    </div>
                   ) : (
                     <Link
                       to={`/product/${product.id}`}
@@ -145,31 +153,61 @@ export default function FeaturedCarousel({ products }) {
               </div>
 
               {/* IMAGEM + OVERLAY — MOBILE (e lado direito no desktop) */}
-              <Link
-                to={`/product/${product.id}`}
-                className="w-full md:w-1/2 h-full relative block"
-              >
-                <img
-                  src={product.imgUrl}
-                  alt={product.name}
-                  className="w-full h-full object-cover object-center"
-                />
+              {product.affiliateUrl ? (
+                <a
+                  href={product.affiliateUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full md:w-1/2 h-full relative block"
+                >
+                  <img
+                    src={product.imgUrl}
+                    alt={product.name}
+                    className="w-full h-full object-cover object-center"
+                  />
 
-                {/* badge no mobile */}
-                <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-pink-600/90 text-[11px] font-bold text-white md:hidden">
-                  Destaque do dia
-                </div>
+                  {/* badge no mobile */}
+                  <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-pink-600/90 text-[11px] font-bold text-white md:hidden">
+                    Destaque do dia
+                  </div>
 
-                {/* nome + preço sobre a imagem no mobile */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent md:hidden">
-                  <div className="text-sm font-semibold text-white truncate">
-                    {product.name}
+                  {/* nome + preço sobre a imagem no mobile */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent md:hidden">
+                    <div className="text-sm font-semibold text-white truncate">
+                      {product.name}
+                    </div>
+                    <div className="text-xs text-pink-100 font-bold">
+                      R$ {product.price?.toFixed(2)}
+                    </div>
                   </div>
-                  <div className="text-xs text-pink-100 font-bold">
-                    R$ {product.price?.toFixed(2)}
+                </a>
+              ) : (
+                <Link
+                  to={`/product/${product.id}`}
+                  className="w-full md:w-1/2 h-full relative block"
+                >
+                  <img
+                    src={product.imgUrl}
+                    alt={product.name}
+                    className="w-full h-full object-cover object-center"
+                  />
+
+                  {/* badge no mobile */}
+                  <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-pink-600/90 text-[11px] font-bold text-white md:hidden">
+                    Destaque do dia
                   </div>
-                </div>
-              </Link>
+
+                  {/* nome + preço sobre a imagem no mobile */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent md:hidden">
+                    <div className="text-sm font-semibold text-white truncate">
+                      {product.name}
+                    </div>
+                    <div className="text-xs text-pink-100 font-bold">
+                      R$ {product.price?.toFixed(2)}
+                    </div>
+                  </div>
+                </Link>
+              )}
             </div>
           );
         })}
