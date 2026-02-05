@@ -30,7 +30,7 @@ export default function FeaturedCarousel({ products }) {
   const goTo = (index) => setCurrent(index);
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto mb-6 md:mb-12 overflow-hidden rounded-2xl shadow-2xl bg-white h-[260px] md:h-[420px]">
+    <div className="relative w-full max-w-7xl mx-auto mb-6 md:mb-12 overflow-hidden rounded-2xl shadow-2xl bg-white h-[200px] md:h-[420px]">
       <div className="w-full h-full relative">
         {/* =========================================================
            SLIDE 0 — HERO REMAKEUP (desktop + mobile)

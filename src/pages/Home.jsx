@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ShoppingCart,
@@ -68,9 +68,9 @@ const resolveLogoUrl = (logoUrl) => {
 export default function Home() {
   const { id: categoryIdParam } = useParams();
   const navigate = useNavigate();
+  const mainContentRef = useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isIntroOpen, setIsIntroOpen] = useState(false);
 
   const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -149,6 +149,16 @@ export default function Home() {
   };
 
   // Só controla a categoria selecionada. O filtro em si é feito no useEffect abaixo.
+  const scrollToMain = () => {
+    if (!mainContentRef.current) return;
+    const offset = 80;
+    const top =
+      mainContentRef.current.getBoundingClientRect().top +
+      window.scrollY -
+      offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
+
   const filterBy = (categoryId) => {
     if (categoryId === 'all') {
       navigate('/');
@@ -158,6 +168,7 @@ export default function Home() {
       setSelectedCategory(categoryId);
     }
     setCurrentPage(0);
+    scrollToMain();
   };
 
   const handleBrandClick = (brandName) => {
@@ -165,6 +176,7 @@ export default function Home() {
       normalizeText(prev) === normalizeText(brandName) ? 'all' : brandName
     );
     setCurrentPage(0);
+    scrollToMain();
   };
 
   const handleSearchChange = (e) => {
@@ -519,7 +531,10 @@ export default function Home() {
       )}
 
       {/* CONTEÚDO PRINCIPAL */}
-      <div className="max-w-7xl mx-auto px-4 py-6 md:py-12 flex flex-col md:flex-row gap-8">
+      <div
+        ref={mainContentRef}
+        className="max-w-7xl mx-auto px-4 py-6 md:py-12 flex flex-col md:flex-row gap-8"
+      >
         {/* SIDEBAR (desktop) */}
         <aside className="hidden md:block w-64 flex-shrink-0">
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 sticky top-24">
@@ -579,31 +594,71 @@ export default function Home() {
 
         {/* CONTEÚDO PRINCIPAL */}
         <div className="flex-1">
-          {/* Categorias em chips (mobile) */}
-          <div className="md:hidden flex overflow-x-auto gap-3 pb-4 mb-4 scrollbar-hide">
-            <button
-              onClick={() => filterBy('all')}
-              className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
-                selectedCategory === 'all'
-                  ? 'bg-pink-600 text-white border-pink-600'
-                  : 'bg-white text-gray-600'
-              }`}
-            >
-              Todos
-            </button>
-            {categories.map((cat) => (
+          {/* Filtros sticky (mobile) */}
+          <div className="md:hidden sticky top-16 z-40 bg-gray-50 pb-3">
+            <div className="flex overflow-x-auto gap-3 pb-3 scrollbar-hide">
               <button
-                key={cat.id}
-                onClick={() => filterBy(cat.id)}
+                onClick={() => filterBy('all')}
                 className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
-                  selectedCategory === cat.id
+                  selectedCategory === 'all'
                     ? 'bg-pink-600 text-white border-pink-600'
                     : 'bg-white text-gray-600'
                 }`}
               >
-                {cat.name}
+                Todos
               </button>
-            ))}
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => filterBy(cat.id)}
+                  className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
+                    selectedCategory === cat.id
+                      ? 'bg-pink-600 text-white border-pink-600'
+                      : 'bg-white text-gray-600'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {brands.map((brand) => {
+                const isActive =
+                  normalizeText(selectedBrand) ===
+                  normalizeText(brand.name);
+                const logoUrl = resolveLogoUrl(brand.logoUrl);
+                const shortLabel = getShortLabel(brand.name);
+
+                return (
+                  <button
+                    key={brand.id}
+                    type="button"
+                    onClick={() => handleBrandClick(brand.name)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] ${
+                      isActive
+                        ? 'border-pink-500 text-pink-600 bg-pink-50'
+                        : 'border-gray-200 text-gray-700 bg-white'
+                    }`}
+                  >
+                    <div className="w-6 h-6 rounded-full overflow-hidden border border-gray-200 flex items-center justify-center text-[9px]">
+                      {logoUrl ? (
+                        <img
+                          src={logoUrl}
+                          alt={brand.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        shortLabel
+                      )}
+                    </div>
+                    <span className="truncate max-w-[90px]">
+                      {brand.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {isDefaultView ? (
@@ -620,6 +675,9 @@ export default function Home() {
                     Uma vitrine de produtos de beleza com curadoria e links para
                     lojas parceiras confiáveis. Ao clicar em um item, você compra
                     direto no site da loja com segurança.
+                  </p>
+                  <p className="md:hidden text-xs text-gray-500 mt-2">
+                    Links oficiais para comprar direto nas lojas parceiras.
                   </p>
                   <div className="mt-3 hidden md:flex flex-wrap gap-3 text-xs text-gray-500">
                     <span className="bg-gray-50 border border-gray-100 rounded-full px-3 py-1">
@@ -645,27 +703,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <div className="md:hidden mt-3">
-                <div className="text-xs text-gray-500">
-                  Vitrine com links confiáveis de lojas parceiras.
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsIntroOpen((prev) => !prev)}
-                  className="mt-2 text-xs font-semibold text-pink-600 hover:text-pink-700"
-                  aria-expanded={isIntroOpen}
-                >
-                  {isIntroOpen ? 'Saiba menos' : 'Saiba mais'}
-                </button>
-                {isIntroOpen && (
-                  <p className="text-gray-600 text-sm leading-relaxed mt-2">
-                    A ReMakeup Store é uma vitrine de produtos de beleza com
-                    curadoria e links de afiliados. Aqui você encontra bases,
-                    batons, skincare e tendências do momento para comparar e
-                    escolher com segurança.
-                  </p>
-                )}
-              </div>
+              <div className="md:hidden mt-2" />
             </section>
           ) : (
             <div className="mb-4 md:mb-6 transition-all duration-300">
@@ -686,7 +724,7 @@ export default function Home() {
           )}
           {/* CARROSSEL DESTAQUES */}
           {isDefaultView && featuredProducts.length > 0 && (
-            <div className="mb-6 md:mb-8 hidden md:block" id="destaques">
+            <div className="mb-6 md:mb-8" id="destaques">
               <div className="flex items-center gap-3 mb-4 md:mb-6">
                 <div className="h-8 w-1 bg-pink-600 rounded-full" />
                 <h2 className="text-xl md:text-2xl font-bold text-gray-800">
@@ -841,18 +879,7 @@ export default function Home() {
             </>
           )}
 
-          {/* CARROSSEL DESTAQUES (mobile, após produtos) */}
-          {isDefaultView && featuredProducts.length > 0 && (
-            <div className="mt-6 md:hidden" id="destaques-mobile">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-6 w-1 bg-pink-600 rounded-full" />
-                <h2 className="text-lg font-bold text-gray-800">
-                  Destaques da Semana
-                </h2>
-              </div>
-              <FeaturedCarousel products={featuredProducts} />
-            </div>
-          )}
+          {/* CARROSSEL DESTAQUES (mobile permanece no topo) */}
         </div>
       </div>
       </div>
