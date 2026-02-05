@@ -159,14 +159,23 @@ export default function Home() {
     window.scrollTo({ top, behavior: 'smooth' });
   };
 
+  const resetFilters = () => {
+    setSelectedCategory('all');
+    setSelectedBrand('all');
+    setSearchTerm('');
+    setCurrentPage(0);
+    navigate('/');
+    scrollToMain();
+  };
+
   const filterBy = (categoryId) => {
     if (categoryId === 'all') {
-      navigate('/');
-      setSelectedCategory('all');
-    } else {
-      navigate(`/categoria/${categoryId}`);
-      setSelectedCategory(categoryId);
+      resetFilters();
+      return;
     }
+
+    navigate(`/categoria/${categoryId}`);
+    setSelectedCategory(categoryId);
     setCurrentPage(0);
     scrollToMain();
   };
@@ -458,7 +467,7 @@ export default function Home() {
               </h3>
               <div className="space-y-1">
                 <button
-                  onClick={() => filterBy('all')}
+                  onClick={resetFilters}
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
                     selectedCategory === 'all'
                       ? 'bg-pink-600 text-white'
@@ -543,7 +552,7 @@ export default function Home() {
             </h3>
             <div className="space-y-2">
               <button
-                onClick={() => filterBy('all')}
+                onClick={resetFilters}
                 className={`w-full text-left px-4 py-3 rounded-xl transition flex items-center justify-between group ${
                   selectedCategory === 'all'
                     ? 'bg-pink-600 text-white shadow-md'
@@ -598,7 +607,7 @@ export default function Home() {
           <div className="md:hidden sticky top-16 z-40 bg-gray-50 pb-3">
             <div className="flex overflow-x-auto gap-3 pb-3 scrollbar-hide">
               <button
-                onClick={() => filterBy('all')}
+                onClick={resetFilters}
                 className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
                   selectedCategory === 'all'
                     ? 'bg-pink-600 text-white border-pink-600'
