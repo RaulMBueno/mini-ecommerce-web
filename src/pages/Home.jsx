@@ -579,8 +579,35 @@ export default function Home() {
 
         {/* CONTEÚDO PRINCIPAL */}
         <div className="flex-1">
+          {/* Categorias em chips (mobile) */}
+          <div className="md:hidden flex overflow-x-auto gap-3 pb-4 mb-4 scrollbar-hide">
+            <button
+              onClick={() => filterBy('all')}
+              className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
+                selectedCategory === 'all'
+                  ? 'bg-pink-600 text-white border-pink-600'
+                  : 'bg-white text-gray-600'
+              }`}
+            >
+              Todos
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => filterBy(cat.id)}
+                className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
+                  selectedCategory === cat.id
+                    ? 'bg-pink-600 text-white border-pink-600'
+                    : 'bg-white text-gray-600'
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+
           {isDefaultView ? (
-            <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-6 mb-6 md:mb-8 transition-all duration-300">
+            <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-6 mb-4 md:mb-8 transition-all duration-300">
               <div className="flex items-start gap-3">
                 <div className="shrink-0 w-9 h-9 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center text-lg">
                   💄
@@ -589,7 +616,7 @@ export default function Home() {
                   <h1 className="text-xl md:text-2xl font-extrabold text-gray-900">
                     Achadinhos da Re – Maquiagem &amp; Beleza
                   </h1>
-                  <p className="text-gray-600 text-sm md:text-base leading-relaxed mt-2">
+                  <p className="hidden md:block text-gray-600 text-sm md:text-base leading-relaxed mt-2">
                     Uma vitrine de produtos de beleza com curadoria e links para
                     lojas parceiras confiáveis. Ao clicar em um item, você compra
                     direto no site da loja com segurança.
@@ -618,9 +645,9 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <div className="md:hidden mt-4">
-                <div className="text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg p-3">
-                  Achadinhos da Re – links confiáveis de lojas parceiras 💄
+              <div className="md:hidden mt-3">
+                <div className="text-xs text-gray-500">
+                  Vitrine com links confiáveis de lojas parceiras.
                 </div>
                 <button
                   type="button"
@@ -657,36 +684,9 @@ export default function Home() {
               </p>
             </div>
           )}
-          {/* Categorias em chips (mobile) */}
-          <div className="md:hidden flex overflow-x-auto gap-3 pb-4 mb-4 scrollbar-hide">
-            <button
-              onClick={() => filterBy('all')}
-              className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
-                selectedCategory === 'all'
-                  ? 'bg-pink-600 text-white border-pink-600'
-                  : 'bg-white text-gray-600'
-              }`}
-            >
-              Todos
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => filterBy(cat.id)}
-                className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
-                  selectedCategory === cat.id
-                    ? 'bg-pink-600 text-white border-pink-600'
-                    : 'bg-white text-gray-600'
-                }`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-
           {/* CARROSSEL DESTAQUES */}
           {isDefaultView && featuredProducts.length > 0 && (
-            <div className="mb-6 md:mb-8" id="destaques">
+            <div className="mb-6 md:mb-8 hidden md:block" id="destaques">
               <div className="flex items-center gap-3 mb-4 md:mb-6">
                 <div className="h-8 w-1 bg-pink-600 rounded-full" />
                 <h2 className="text-xl md:text-2xl font-bold text-gray-800">
@@ -839,6 +839,19 @@ export default function Home() {
                 </div>
               )}
             </>
+          )}
+
+          {/* CARROSSEL DESTAQUES (mobile, após produtos) */}
+          {isDefaultView && featuredProducts.length > 0 && (
+            <div className="mt-6 md:hidden" id="destaques-mobile">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-6 w-1 bg-pink-600 rounded-full" />
+                <h2 className="text-lg font-bold text-gray-800">
+                  Destaques da Semana
+                </h2>
+              </div>
+              <FeaturedCarousel products={featuredProducts} />
+            </div>
           )}
         </div>
       </div>
