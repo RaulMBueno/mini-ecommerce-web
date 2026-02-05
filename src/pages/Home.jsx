@@ -71,6 +71,7 @@ export default function Home() {
   const mainContentRef = useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isHighlightsOpen, setIsHighlightsOpen] = useState(true);
 
   const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -150,13 +151,7 @@ export default function Home() {
 
   // Só controla a categoria selecionada. O filtro em si é feito no useEffect abaixo.
   const scrollToMain = () => {
-    if (!mainContentRef.current) return;
-    const offset = 80;
-    const top =
-      mainContentRef.current.getBoundingClientRect().top +
-      window.scrollY -
-      offset;
-    window.scrollTo({ top, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const resetFilters = () => {
@@ -192,6 +187,30 @@ export default function Home() {
     setSearchTerm(e.target.value);
     setCurrentPage(0);
   };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isMenuOpen) {
+        setIsMenuOpen(false);
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      window.history.pushState({ menuOpen: true }, '', window.location.pathname);
+      document.body.style.overflow = 'hidden';
+    } else {
+      if (window.history.state?.menuOpen) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+      document.body.style.overflow = '';
+    }
+  }, [isMenuOpen]);
 
   // Combina filtros: categoria + marca + busca
   useEffect(() => {
@@ -604,71 +623,85 @@ export default function Home() {
         {/* CONTEÚDO PRINCIPAL */}
         <div className="flex-1">
           {/* Filtros sticky (mobile) */}
-          <div className="md:hidden sticky top-16 z-40 bg-gray-50 pb-3">
-            <div className="flex overflow-x-auto gap-3 pb-3 scrollbar-hide">
-              <button
-                onClick={resetFilters}
-                className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
-                  selectedCategory === 'all'
-                    ? 'bg-pink-600 text-white border-pink-600'
-                    : 'bg-white text-gray-600'
-                }`}
-              >
-                Todos
-              </button>
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => filterBy(cat.id)}
-                  className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
-                    selectedCategory === cat.id
-                      ? 'bg-pink-600 text-white border-pink-600'
-                      : 'bg-white text-gray-600'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-              {brands.map((brand) => {
-                const isActive =
-                  normalizeText(selectedBrand) ===
-                  normalizeText(brand.name);
-                const logoUrl = resolveLogoUrl(brand.logoUrl);
-                const shortLabel = getShortLabel(brand.name);
-
-                return (
+          {!isMenuOpen && (
+            <div className="md:hidden sticky top-16 z-40 bg-gray-50 pb-3">
+              <div className="relative">
+                <div className="flex overflow-x-auto gap-3 pb-3 pr-8 scrollbar-hide">
                   <button
-                    key={brand.id}
-                    type="button"
-                    onClick={() => handleBrandClick(brand.name)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] ${
-                      isActive
-                        ? 'border-pink-500 text-pink-600 bg-pink-50'
-                        : 'border-gray-200 text-gray-700 bg-white'
+                    onClick={resetFilters}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
+                      selectedCategory === 'all'
+                        ? 'bg-pink-600 text-white border-pink-600'
+                        : 'bg-white text-gray-600'
                     }`}
                   >
-                    <div className="w-6 h-6 rounded-full overflow-hidden border border-gray-200 flex items-center justify-center text-[9px]">
-                      {logoUrl ? (
-                        <img
-                          src={logoUrl}
-                          alt={brand.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        shortLabel
-                      )}
-                    </div>
-                    <span className="truncate max-w-[90px]">
-                      {brand.name}
-                    </span>
+                    Todos
                   </button>
-                );
-              })}
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => filterBy(cat.id)}
+                      className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
+                        selectedCategory === cat.id
+                          ? 'bg-pink-600 text-white border-pink-600'
+                          : 'bg-white text-gray-600'
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+                <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-gray-50 to-transparent" />
+                <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
+                  →
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="flex gap-3 overflow-x-auto pb-2 pr-8 scrollbar-hide">
+                  {brands.map((brand) => {
+                    const isActive =
+                      normalizeText(selectedBrand) ===
+                      normalizeText(brand.name);
+                    const logoUrl = resolveLogoUrl(brand.logoUrl);
+                    const shortLabel = getShortLabel(brand.name);
+
+                    return (
+                      <button
+                        key={brand.id}
+                        type="button"
+                        onClick={() => handleBrandClick(brand.name)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] ${
+                          isActive
+                            ? 'border-pink-500 text-pink-600 bg-pink-50'
+                            : 'border-gray-200 text-gray-700 bg-white'
+                        }`}
+                      >
+                        <div className="w-6 h-6 rounded-full overflow-hidden border border-gray-200 flex items-center justify-center text-[9px]">
+                          {logoUrl ? (
+                            <img
+                              src={logoUrl}
+                              alt={brand.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            shortLabel
+                          )}
+                        </div>
+                        <span className="truncate max-w-[90px]">
+                          {brand.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-gray-50 to-transparent" />
+                <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
+                  →
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
           {isDefaultView ? (
             <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-6 mb-4 md:mb-8 transition-all duration-300">
@@ -734,13 +767,24 @@ export default function Home() {
           {/* CARROSSEL DESTAQUES */}
           {isDefaultView && featuredProducts.length > 0 && (
             <div className="mb-6 md:mb-8" id="destaques">
-              <div className="flex items-center gap-3 mb-4 md:mb-6">
-                <div className="h-8 w-1 bg-pink-600 rounded-full" />
-                <h2 className="text-xl md:text-2xl font-bold text-gray-800">
-                  Destaques da Semana
-                </h2>
+              <div className="flex items-center justify-between mb-4 md:mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-1 bg-pink-600 rounded-full" />
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+                    Destaques da Semana
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsHighlightsOpen((prev) => !prev)}
+                  className="md:hidden text-xs font-semibold text-pink-600 hover:text-pink-700"
+                >
+                  {isHighlightsOpen ? 'Ocultar' : 'Mostrar'}
+                </button>
               </div>
-              <FeaturedCarousel products={featuredProducts} />
+              <div className={`${isHighlightsOpen ? 'block' : 'hidden'} md:block`}>
+                <FeaturedCarousel products={featuredProducts} />
+              </div>
             </div>
           )}
 

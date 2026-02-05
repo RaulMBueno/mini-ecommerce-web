@@ -30,7 +30,7 @@ export default function FeaturedCarousel({ products }) {
   const goTo = (index) => setCurrent(index);
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto mb-6 md:mb-12 overflow-hidden rounded-2xl shadow-2xl bg-white h-[200px] md:h-[420px]">
+    <div className="relative w-full max-w-7xl mx-auto mb-6 md:mb-12 overflow-hidden rounded-2xl shadow-2xl bg-white h-[180px] md:h-[420px]">
       <div className="w-full h-full relative">
         {/* =========================================================
            SLIDE 0 — HERO REMAKEUP (desktop + mobile)
@@ -50,29 +50,34 @@ export default function FeaturedCarousel({ products }) {
             {/* overlay geral – AGORA CLARO EM TODAS AS TELAS */}
             <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/85 to-transparent" />
 
-            <div className="absolute inset-0 flex flex-col md:flex-row items-center md:items-center justify-center px-5 md:px-12 gap-6">
+            <div className="absolute inset-0 flex flex-col md:flex-row items-center md:items-center justify-center px-4 md:px-12 gap-4 md:gap-6">
               {/* TEXTO PRINCIPAL */}
               <div className="w-full md:w-2/3 lg:w-1/2 text-left z-20">
-                <span className="inline-flex items-center px-3 py-1 bg-pink-600/90 text-white text-[11px] font-semibold rounded-full mb-3 uppercase tracking-wide">
+                <span className="hidden md:inline-flex items-center px-3 py-1 bg-pink-600/90 text-white text-[11px] font-semibold rounded-full mb-3 uppercase tracking-wide">
                   Destaques do dia 🔥
                 </span>
 
-                <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-3">
+                <h2 className="text-xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-2 md:mb-3">
                   Realce sua{' '}
                   <span className="text-pink-600">
                     beleza única
                   </span>
                 </h2>
 
-                <p className="text-sm md:text-base text-gray-600 max-w-md mb-4 md:mb-6">
+                <p className="hidden md:block text-sm md:text-base text-gray-600 max-w-md mb-4 md:mb-6">
                   ReMakeup Store: seleção especial de maquiagens, skincare e
                   cursos pensados para valorizar o seu estilo.
+                </p>
+                <p className="md:hidden text-[12px] text-gray-600 max-w-xs mb-3">
+                  Achadinhos da Re – Maquiagem &amp; Beleza
+                  <br />
+                  Links oficiais para comprar direto nas lojas parceiras.
                 </p>
 
                 <div className="flex items-center gap-3">
                   <Link
                     to="/"
-                    className="px-5 py-2.5 md:px-7 md:py-3 bg-pink-600 text-white text-sm md:text-base font-bold rounded-full shadow-lg hover:bg-pink-700 transition"
+                    className="px-4 py-2 md:px-7 md:py-3 bg-pink-600 text-white text-xs md:text-base font-bold rounded-full shadow-lg hover:bg-pink-700 transition"
                   >
                     Ver produtos
                   </Link>
