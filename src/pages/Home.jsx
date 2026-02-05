@@ -70,6 +70,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isIntroOpen, setIsIntroOpen] = useState(false);
 
   const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -575,17 +576,65 @@ export default function Home() {
 
         {/* CONTEÚDO PRINCIPAL */}
         <div className="flex-1">
-          <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8 mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-3">
-              ReMakeup Store – Vitrine de Maquiagem e Beleza
-            </h1>
-            <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-              A ReMakeup Store reúne maquiagem e beleza em uma vitrine com
-              curadoria de criadores e links de afiliados. Aqui você encontra
-              bases, batons, skincare e tendências do momento para comparar e
-              escolher com segurança. Ao clicar em um produto, você é direcionado
-              para a loja parceira para finalizar a compra com confiança.
-            </p>
+          <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-6 mb-6 md:mb-8">
+            <div className="flex items-start gap-3">
+              <div className="shrink-0 w-9 h-9 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center text-lg">
+                💄
+              </div>
+              <div className="flex-1">
+                <h1 className="text-xl md:text-2xl font-extrabold text-gray-900">
+                  Achadinhos da Re – Maquiagem &amp; Beleza
+                </h1>
+                <p className="text-gray-600 text-sm md:text-base leading-relaxed mt-2">
+                  Uma vitrine de produtos de beleza com curadoria e links para
+                  lojas parceiras confiáveis. Ao clicar em um item, você compra
+                  direto no site da loja com segurança.
+                </p>
+                <div className="mt-3 hidden md:flex flex-wrap gap-3 text-xs text-gray-500">
+                  <span className="bg-gray-50 border border-gray-100 rounded-full px-3 py-1">
+                    ✨ Curadoria de produtos de beleza
+                  </span>
+                  <span className="bg-gray-50 border border-gray-100 rounded-full px-3 py-1">
+                    🔗 Links de lojas parceiras oficiais
+                  </span>
+                  <span className="bg-gray-50 border border-gray-100 rounded-full px-3 py-1">
+                    🛍️ Você compra direto no site da loja
+                  </span>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <span className="text-[11px] text-gray-500 bg-gray-50 border border-gray-100 rounded-full px-3 py-1">
+                    🔒 Links para lojas oficiais
+                  </span>
+                  <a
+                    href="#destaques"
+                    className="text-xs font-semibold text-pink-600 hover:text-pink-700"
+                  >
+                    Ver destaques ↓
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div className="md:hidden mt-4">
+              <div className="text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg p-3">
+                Achadinhos da Re – links confiáveis de lojas parceiras 💄
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsIntroOpen((prev) => !prev)}
+                className="mt-2 text-xs font-semibold text-pink-600 hover:text-pink-700"
+                aria-expanded={isIntroOpen}
+              >
+                {isIntroOpen ? 'Saiba menos' : 'Saiba mais'}
+              </button>
+              {isIntroOpen && (
+                <p className="text-gray-600 text-sm leading-relaxed mt-2">
+                  A ReMakeup Store é uma vitrine de produtos de beleza com
+                  curadoria e links de afiliados. Aqui você encontra bases,
+                  batons, skincare e tendências do momento para comparar e
+                  escolher com segurança.
+                </p>
+              )}
+            </div>
           </section>
           {/* Categorias em chips (mobile) */}
           <div className="md:hidden flex overflow-x-auto gap-3 pb-4 mb-4 scrollbar-hide">
@@ -616,7 +665,7 @@ export default function Home() {
 
           {/* CARROSSEL DESTAQUES */}
           {featuredProducts.length > 0 && (
-            <div className="mb-6 md:mb-8">
+            <div className="mb-6 md:mb-8" id="destaques">
               <div className="flex items-center gap-3 mb-4 md:mb-6">
                 <div className="h-8 w-1 bg-pink-600 rounded-full" />
                 <h2 className="text-xl md:text-2xl font-bold text-gray-800">
