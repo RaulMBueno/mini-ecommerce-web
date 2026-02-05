@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ShoppingCart,
   LogIn,
@@ -66,6 +66,8 @@ const resolveLogoUrl = (logoUrl) => {
 };
 
 export default function Home() {
+  const { id: categoryIdParam } = useParams();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -88,6 +90,22 @@ export default function Home() {
     fetchData();
     checkLogin();
   }, []);
+
+  useEffect(() => {
+    if (!categoryIdParam) {
+      setSelectedCategory('all');
+      return;
+    }
+
+    const parsedId = Number(categoryIdParam);
+    if (Number.isNaN(parsedId)) {
+      setSelectedCategory('all');
+      return;
+    }
+
+    setSelectedCategory(parsedId);
+    setCurrentPage(0);
+  }, [categoryIdParam]);
 
   // Verifica token no localStorage
   const checkLogin = () => {
@@ -131,7 +149,13 @@ export default function Home() {
 
   // Só controla a categoria selecionada. O filtro em si é feito no useEffect abaixo.
   const filterBy = (categoryId) => {
-    setSelectedCategory(categoryId);
+    if (categoryId === 'all') {
+      navigate('/');
+      setSelectedCategory('all');
+    } else {
+      navigate(`/categoria/${categoryId}`);
+      setSelectedCategory(categoryId);
+    }
     setCurrentPage(0);
   };
 
@@ -214,11 +238,41 @@ export default function Home() {
     if (canGoNext) setCurrentPage((prev) => prev + 1);
   };
 
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        name: 'ReMakeup Store',
+        url: 'https://remakeup.com.br',
+        description:
+          'Loja de maquiagem e beleza com produtos selecionados, ofertas e afiliados. Entrega rápida e vitrine completa.',
+        inLanguage: 'pt-BR',
+      },
+      {
+        '@type': 'Organization',
+        name: 'ReMakeup Store',
+        url: 'https://remakeup.com.br',
+        logo: 'https://remakeup.com.br/hero-banner.jpg',
+      },
+      {
+        '@type': 'WebPage',
+        name: 'ReMakeup Store – Vitrine de Maquiagem e Beleza',
+        url: 'https://remakeup.com.br/',
+        inLanguage: 'pt-BR',
+      },
+    ],
+  };
+
   return (
     <>
       <PageMeta
         title="ReMakeup Store – Maquiagens, Beleza e Afiliados"
         description="Loja de maquiagem e beleza com produtos selecionados, ofertas e afiliados. Entrega rápida e vitrine completa."
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <div className="min-h-screen bg-gray-50 font-sans">
       {/* NAVBAR */}
@@ -526,11 +580,11 @@ export default function Home() {
               ReMakeup Store – Vitrine de Maquiagem e Beleza
             </h1>
             <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-              A ReMakeup Store é uma vitrine de produtos de maquiagem e beleza
-              com curadoria de criadores e links de afiliados. Aqui você encontra
-              sugestões de bases, batons, cuidados com a pele e tendências do
-              momento. Ao clicar em um produto, você será direcionado para a loja
-              parceira para finalizar sua compra com segurança.
+              A ReMakeup Store reúne maquiagem e beleza em uma vitrine com
+              curadoria de criadores e links de afiliados. Aqui você encontra
+              bases, batons, skincare e tendências do momento para comparar e
+              escolher com segurança. Ao clicar em um produto, você é direcionado
+              para a loja parceira para finalizar a compra com confiança.
             </p>
           </section>
           {/* Categorias em chips (mobile) */}
