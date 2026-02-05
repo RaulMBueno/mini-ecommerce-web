@@ -521,6 +521,18 @@ export default function Home() {
 
         {/* CONTEÚDO PRINCIPAL */}
         <div className="flex-1">
+          <section className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8 mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-3">
+              ReMakeup Store – Vitrine de Maquiagem e Beleza
+            </h1>
+            <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+              A ReMakeup Store é uma vitrine de produtos de maquiagem e beleza
+              com curadoria de criadores e links de afiliados. Aqui você encontra
+              sugestões de bases, batons, cuidados com a pele e tendências do
+              momento. Ao clicar em um produto, você será direcionado para a loja
+              parceira para finalizar sua compra com segurança.
+            </p>
+          </section>
           {/* Categorias em chips (mobile) */}
           <div className="md:hidden flex overflow-x-auto gap-3 pb-4 mb-4 scrollbar-hide">
             <button
