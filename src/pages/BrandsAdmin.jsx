@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
+import PageMeta from '../components/PageMeta';
 import {
   ArrowLeft,
   Save,
@@ -120,7 +121,13 @@ export default function BrandsAdmin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <>
+      <PageMeta
+        title="Gerenciar Marcas | ReMakeup Store"
+        description="Administre marcas e logos da ReMakeup Store."
+        noIndex
+      />
+      <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto space-y-10">
         {/* Cabeçalho */}
         <div className="flex items-center justify-between gap-4">
@@ -296,6 +303,7 @@ export default function BrandsAdmin() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

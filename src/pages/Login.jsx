@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api'; // <--- Usamos o nosso cliente inteligente
+import PageMeta from '../components/PageMeta';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
@@ -32,7 +33,13 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <>
+      <PageMeta
+        title="Login | ReMakeup Store"
+        description="Acesso ao painel administrativo da ReMakeup Store."
+        noIndex
+      />
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <h1 className="text-2xl font-bold text-center text-pink-600 mb-6">Acesso Restrito</h1>
         
@@ -64,6 +71,7 @@ export default function Login() {
           </button>
         </form>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

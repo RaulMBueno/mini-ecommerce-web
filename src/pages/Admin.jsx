@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
+import PageMeta from '../components/PageMeta';
 import {
   ArrowLeft,
   Save,
@@ -186,7 +187,13 @@ export default function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <>
+      <PageMeta
+        title="Painel Administrativo | ReMakeup Store"
+        description="Gerencie produtos, categorias e marcas da ReMakeup Store."
+        noIndex
+      />
+      <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         {/* Cabeçalho */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -523,6 +530,7 @@ export default function Admin() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

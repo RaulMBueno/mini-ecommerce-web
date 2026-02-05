@@ -16,6 +16,7 @@ import {
 import api from '../api';
 import FeaturedCarousel from '../components/FeaturedCarousel';
 import ProductCard from '../components/ProductCard';
+import PageMeta from '../components/PageMeta';
 
 // Map com siglas personalizadas (opcional)
 const BRAND_SHORT_LABELS = {
@@ -214,7 +215,12 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <>
+      <PageMeta
+        title="ReMakeup Store – Maquiagens, Beleza e Afiliados"
+        description="Loja de maquiagem e beleza com produtos selecionados, ofertas e afiliados. Entrega rápida e vitrine completa."
+      />
+      <div className="min-h-screen bg-gray-50 font-sans">
       {/* NAVBAR */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -698,6 +704,7 @@ export default function Home() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../api';
+import PageMeta from '../components/PageMeta';
 import { ShoppingCart, ExternalLink, ArrowLeft, Loader } from 'lucide-react';
 
 export default function ProductDetails() {
@@ -21,6 +22,13 @@ export default function ProductDetails() {
       });
   }, [id]);
 
+  const metaTitle = product
+    ? `${product.name} | ReMakeup Store`
+    : 'Produto | ReMakeup Store';
+  const metaDescription = product?.description
+    ? product.description
+    : 'Detalhes do produto na ReMakeup Store.';
+
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
@@ -38,7 +46,9 @@ export default function ProductDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <>
+      <PageMeta title={metaTitle} description={metaDescription} />
+      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Botão Voltar */}
         <Link
@@ -112,6 +122,7 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

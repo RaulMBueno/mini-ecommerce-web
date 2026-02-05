@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 // import axios from 'axios'; // REMOVIDO
 import api from '../api'; // <--- USANDO API INTELIGENTE
+import PageMeta from '../components/PageMeta';
 import { ArrowLeft, Plus, Trash2, Tag } from 'lucide-react';
 
 export default function CategoriesAdmin() {
@@ -51,7 +52,13 @@ export default function CategoriesAdmin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <>
+      <PageMeta
+        title="Gerenciar Categorias | ReMakeup Store"
+        description="Administre categorias de produtos da ReMakeup Store."
+        noIndex
+      />
+      <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-2xl mx-auto">
         
         <div className="flex items-center gap-4 mb-8">
@@ -112,6 +119,7 @@ export default function CategoriesAdmin() {
         </div>
 
       </div>
-    </div>
+      </div>
+    </>
   );
 }
