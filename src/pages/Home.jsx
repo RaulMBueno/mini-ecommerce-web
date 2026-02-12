@@ -275,11 +275,17 @@ export default function Home() {
   const canGoNext = currentPage < totalPages - 1;
 
   const goPrev = () => {
-    if (canGoPrev) setCurrentPage((prev) => prev - 1);
+    if (canGoPrev) {
+      setCurrentPage((prev) => prev - 1);
+      scrollToMain();
+    }
   };
 
   const goNext = () => {
-    if (canGoNext) setCurrentPage((prev) => prev + 1);
+    if (canGoNext) {
+      setCurrentPage((prev) => prev + 1);
+      scrollToMain();
+    }
   };
 
   const structuredData = {
