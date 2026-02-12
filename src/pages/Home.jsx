@@ -186,6 +186,7 @@ export default function Home() {
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(0);
+    scrollToMain();
   };
 
   useEffect(() => {
@@ -805,7 +806,11 @@ export default function Home() {
               {selectedBrand !== 'all' && (
                 <button
                   type="button"
-                  onClick={() => setSelectedBrand('all')}
+                  onClick={() => {
+                    setSelectedBrand('all');
+                    setCurrentPage(0);
+                    scrollToMain();
+                  }}
                   className="text-xs text-pink-600 hover:underline"
                 >
                   Limpar filtro
