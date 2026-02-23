@@ -69,6 +69,7 @@ export default function Home() {
   const { id: categoryIdParam } = useParams();
   const navigate = useNavigate();
   const mainContentRef = useRef(null);
+  const mobileSearchRef = useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isHighlightsOpen, setIsHighlightsOpen] = useState(true);
@@ -185,6 +186,20 @@ export default function Home() {
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
+    setCurrentPage(0);
+    scrollToMain();
+  };
+
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (mobileSearchRef.current) {
+      mobileSearchRef.current.blur();
+    }
+    scrollToMain();
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
     setCurrentPage(0);
     scrollToMain();
   };
@@ -404,16 +419,33 @@ export default function Home() {
           </div>
           {/* Busca mobile abaixo do logo */}
           <div className="md:hidden pb-3">
-            <div className="relative">
+            <form className="relative" onSubmit={handleSearchSubmit}>
+              <button
+                type="submit"
+                className="absolute left-3 top-3 text-gray-400"
+                aria-label="Buscar"
+              >
+                <Search className="h-4 w-4" />
+              </button>
               <input
-                type="text"
+                ref={mobileSearchRef}
+                type="search"
                 placeholder="Buscar produtos..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="w-full pl-10 pr-3 py-2.5 bg-gray-100 rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-pink-200 outline-none"
+                className="w-full pl-10 pr-10 py-2.5 bg-gray-100 rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-pink-200 outline-none"
               />
-              <Search className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
-            </div>
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  className="absolute right-3 top-2.5 text-xs font-semibold text-gray-500"
+                  aria-label="Limpar busca"
+                >
+                  Limpar
+                </button>
+              )}
+            </form>
           </div>
         </div>
       </nav>
