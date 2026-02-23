@@ -61,8 +61,11 @@ export default function FeaturedCarousel({ products }) {
                 </h2>
 
                 <p className="hidden md:block text-sm md:text-base text-gray-600 max-w-md mb-4 md:mb-6">
-                  ReMakeup Store: seleção especial de maquiagens, skincare e
-                  cursos pensados para valorizar o seu estilo.
+                  ReMakeup: O que há de melhor em beleza.
+                  <br />
+                  Encontre uma seleção exclusiva de maquiagens, produtos de
+                  skincare e batons. Tudo o que você precisa para valorizar o
+                  seu estilo.
                 </p>
                 <p className="md:hidden text-[12px] text-gray-600 max-w-xs mb-3">
                   Achadinhos da Re – Maquiagem &amp; Beleza

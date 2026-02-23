@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* brand gold heading tone */
+h1,
+h2,
+h3 {
+  color: #8b6b2e;
+}
+
 /* hide scrollbar but keep scroll */
 .scrollbar-hide {
   -ms-overflow-style: none;
