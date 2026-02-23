@@ -643,7 +643,7 @@ export default function Home() {
         {/* CONTEÚDO PRINCIPAL */}
         <div className="flex-1">
           {/* Carrossel compacto no mobile */}
-          {isDefaultView && featuredProducts.length > 0 && (
+          {isDefaultView && !searchTerm.trim() && featuredProducts.length > 0 && (
             <div className="md:hidden">
               <FeaturedCarousel products={featuredProducts} compact />
             </div>
@@ -696,7 +696,7 @@ export default function Home() {
             </div>
           )}
           {/* CARROSSEL DESTAQUES */}
-          {isDefaultView && featuredProducts.length > 0 && (
+          {isDefaultView && !searchTerm.trim() && featuredProducts.length > 0 && (
             <div className="mb-6 md:mb-8 hidden md:block" id="destaques">
               <div className="flex items-center justify-between mb-4 md:mb-6">
                 <div className="flex items-center gap-3">
