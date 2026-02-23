@@ -678,52 +678,8 @@ export default function Home() {
             </div>
           </div>
 
-          {isDefaultView ? (
-            <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-6 mb-4 md:mb-8 transition-all duration-300">
-              <div className="flex items-start gap-3">
-                <div className="shrink-0 w-9 h-9 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center text-lg">
-                  💄
-                </div>
-                <div className="flex-1">
-                  <h1 className="text-xl md:text-2xl font-extrabold text-gray-900">
-                    Achadinhos da Re – Maquiagem &amp; Beleza
-                  </h1>
-                  <p className="hidden md:block text-gray-600 text-sm md:text-base leading-relaxed mt-2">
-                    Uma vitrine de produtos de beleza com curadoria e links para
-                    lojas parceiras confiáveis. Ao clicar em um item, você compra
-                    direto no site da loja com segurança.
-                  </p>
-                  <p className="md:hidden text-xs text-gray-500 mt-2">
-                    Links oficiais para comprar direto nas lojas parceiras.
-                  </p>
-                  <div className="mt-3 hidden md:flex flex-wrap gap-3 text-xs text-gray-500">
-                    <span className="bg-gray-50 border border-gray-100 rounded-full px-3 py-1">
-                      ✨ Curadoria de produtos de beleza
-                    </span>
-                    <span className="bg-gray-50 border border-gray-100 rounded-full px-3 py-1">
-                      🔗 Links de lojas parceiras oficiais
-                    </span>
-                    <span className="bg-gray-50 border border-gray-100 rounded-full px-3 py-1">
-                      🛍️ Você compra direto no site da loja
-                    </span>
-                  </div>
-                  <div className="mt-3 flex flex-wrap items-center gap-3">
-                    <span className="text-[11px] text-gray-500 bg-gray-50 border border-gray-100 rounded-full px-3 py-1">
-                      🔒 Links para lojas oficiais
-                    </span>
-                    <a
-                      href="#destaques"
-                      className="text-xs font-semibold text-pink-600 hover:text-pink-700"
-                    >
-                      Ver destaques ↓
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div className="md:hidden mt-2" />
-            </section>
-          ) : (
-            <div className="mb-4 md:mb-6 transition-all duration-300">
+          {!isDefaultView && (
+            <div className="mb-3 md:mb-6 transition-all duration-300">
               <h1 className="text-xl md:text-2xl font-extrabold text-gray-900">
                 {selectedBrand !== 'all'
                   ? `Marca: ${selectedBrand}`
@@ -764,7 +720,7 @@ export default function Home() {
           )}
 
           {/* FAIXA DE MARCAS */}
-          <div className="mb-6 md:mb-8">
+          <div className="mb-4 md:mb-8">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -805,7 +761,7 @@ export default function Home() {
                     }`}
                   >
                     <div
-                      className={`w-14 h-14 rounded-full border bg-white flex items-center justify-center text-xs font-semibold uppercase shadow-sm hover:shadow-md transition-all overflow-hidden ${
+                      className={`w-10 h-10 rounded-full border bg-white flex items-center justify-center text-[10px] font-semibold uppercase shadow-sm hover:shadow-md transition-all overflow-hidden ${
                         isActive
                           ? 'border-pink-500 ring-2 ring-pink-200'
                           : 'border-gray-200'
@@ -823,7 +779,7 @@ export default function Home() {
                         </span>
                       )}
                     </div>
-                    <span className="mt-1 text-[11px] font-medium truncate max-w-[70px]">
+                    <span className="mt-1 text-[10px] font-medium truncate max-w-[64px]">
                       {brand.name}
                     </span>
                   </button>
