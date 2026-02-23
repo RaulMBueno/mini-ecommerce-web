@@ -14,7 +14,7 @@ export default function FeaturedCarousel({ products }) {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % totalSlides);
-    }, 5000);
+    }, 8000);
 
     return () => clearInterval(timer);
   }, [totalSlides]);
@@ -47,16 +47,12 @@ export default function FeaturedCarousel({ products }) {
               className="w-full h-full object-cover"
             />
 
-            {/* overlay geral – AGORA CLARO EM TODAS AS TELAS */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/85 to-transparent" />
+            {/* overlay geral */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/70 to-transparent" />
 
-            <div className="absolute inset-0 flex flex-col md:flex-row items-center md:items-center justify-center px-4 md:px-12 gap-4 md:gap-6">
+            <div className="absolute inset-0 flex flex-col items-start justify-start px-4 md:px-10 pt-5 md:pt-10 gap-3">
               {/* TEXTO PRINCIPAL */}
-              <div className="w-full md:w-2/3 lg:w-1/2 text-left z-20">
-                <span className="hidden md:inline-flex items-center px-3 py-1 bg-pink-600/90 text-white text-[11px] font-semibold rounded-full mb-3 uppercase tracking-wide">
-                  Destaques do dia 🔥
-                </span>
-
+              <div className="w-full md:w-1/2 text-left z-20">
                 <h2 className="text-xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-2 md:mb-3">
                   Realce sua{' '}
                   <span className="text-pink-600">
@@ -74,17 +70,7 @@ export default function FeaturedCarousel({ products }) {
                   Links oficiais para comprar direto nas lojas parceiras.
                 </p>
 
-                <div className="flex items-center gap-3">
-                  <Link
-                    to="/"
-                    className="px-4 py-2 md:px-7 md:py-3 bg-pink-600 text-white text-xs md:text-base font-bold rounded-full shadow-lg hover:bg-pink-700 transition"
-                  >
-                    Ver produtos
-                  </Link>
-                  <span className="hidden md:inline text-sm text-gray-500">
-                    Role para ver a vitrine completa
-                  </span>
-                </div>
+                {/* CTA removido para visual mais clean */}
               </div>
             </div>
           </div>
