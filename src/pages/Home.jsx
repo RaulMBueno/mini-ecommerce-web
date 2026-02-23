@@ -364,9 +364,18 @@ export default function Home() {
                   placeholder="O que você procura?"
                   value={searchTerm}
                   onChange={handleSearchChange}
-                  className="pl-10 pr-4 py-2 bg-gray-100 border-transparent rounded-full focus:bg-white focus:border-pink-300 focus:ring-2 focus:ring-pink-200 w-72 transition-all outline-none"
+                  className="pl-10 pr-20 py-2 bg-gray-100 border-transparent rounded-full focus:bg-white focus:border-pink-300 focus:ring-2 focus:ring-pink-200 w-72 transition-all outline-none"
                 />
                 <Search className="h-5 w-5 text-gray-400 absolute left-3 top-2.5 group-focus-within:text-pink-500 transition-colors" />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="absolute right-2 top-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-pink-600 text-white hover:bg-pink-700"
+                  >
+                    Limpar
+                  </button>
+                )}
               </div>
 
               {/* Link Painel Admin só se logado */}
@@ -439,7 +448,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="absolute right-3 top-2.5 text-xs font-semibold text-gray-500"
+                  className="absolute right-2 top-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-pink-600 text-white hover:bg-pink-700"
                   aria-label="Limpar busca"
                 >
                   Limpar
