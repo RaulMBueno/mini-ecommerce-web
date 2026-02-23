@@ -2,11 +2,74 @@
 @tailwind components;
 @tailwind utilities;
 
-/* brand gold heading tone */
+/* brand gold theme */
+:root {
+  --brand-gold: #7a5b26;
+  --brand-gold-dark: #6a4f21;
+  --brand-gold-light: #f6f1e6;
+  --brand-gold-very-light: #fbf8f0;
+}
+
 h1,
 h2,
 h3 {
-  color: #8b6b2e;
+  color: var(--brand-gold);
+}
+
+/* override pink utility classes to gold */
+.text-pink-100 {
+  color: var(--brand-gold-light);
+}
+.text-pink-500,
+.text-pink-600,
+.text-pink-700,
+.text-pink-800 {
+  color: var(--brand-gold);
+}
+.hover\:text-pink-600:hover,
+.hover\:text-pink-700:hover {
+  color: var(--brand-gold-dark);
+}
+.bg-pink-50 {
+  background-color: var(--brand-gold-very-light);
+}
+.bg-pink-100,
+.bg-pink-200 {
+  background-color: var(--brand-gold-light);
+}
+.bg-pink-600,
+.bg-pink-700 {
+  background-color: var(--brand-gold);
+}
+.hover\:bg-pink-600:hover,
+.hover\:bg-pink-700:hover {
+  background-color: var(--brand-gold-dark);
+}
+.bg-pink-600\/90 {
+  background-color: color-mix(in srgb, var(--brand-gold) 90%, transparent);
+}
+.border-pink-100,
+.border-pink-200 {
+  border-color: var(--brand-gold-light);
+}
+.border-pink-500,
+.border-pink-600 {
+  border-color: var(--brand-gold);
+}
+.ring-pink-200 {
+  --tw-ring-color: var(--brand-gold-light);
+}
+.ring-pink-500,
+.focus\:ring-pink-500:focus,
+.focus\:ring-pink-200:focus {
+  --tw-ring-color: var(--brand-gold);
+}
+.accent-pink-600 {
+  accent-color: var(--brand-gold);
+}
+.hover\:shadow-pink-500\/30:hover {
+  --tw-shadow-color: var(--brand-gold);
+  --tw-shadow: var(--tw-shadow-colored);
 }
 
 /* hide scrollbar but keep scroll */
