@@ -402,6 +402,19 @@ export default function Home() {
               </button>
             </div>
           </div>
+          {/* Busca mobile abaixo do logo */}
+          <div className="md:hidden pb-3">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Buscar produtos..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="w-full pl-10 pr-3 py-2.5 bg-gray-100 rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-pink-200 outline-none"
+              />
+              <Search className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
+            </div>
+          </div>
         </div>
       </nav>
 
@@ -629,86 +642,41 @@ export default function Home() {
 
         {/* CONTEÚDO PRINCIPAL */}
         <div className="flex-1">
-          {/* Filtros sticky (mobile) */}
-          {!isMenuOpen && (
-            <div className="md:hidden sticky top-16 z-40 bg-gray-50 pb-3">
-              <div className="relative">
-                <div className="flex overflow-x-auto gap-3 pb-3 pr-8 scrollbar-hide">
-                  <button
-                    onClick={resetFilters}
-                    className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
-                      selectedCategory === 'all'
-                        ? 'bg-pink-600 text-white border-pink-600'
-                        : 'bg-white text-gray-600'
-                    }`}
-                  >
-                    Todos
-                  </button>
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => filterBy(cat.id)}
-                      className={`whitespace-nowrap px-4 py-2 rounded-full border text-xs ${
-                        selectedCategory === cat.id
-                          ? 'bg-pink-600 text-white border-pink-600'
-                          : 'bg-white text-gray-600'
-                      }`}
-                    >
-                      {cat.name}
-                    </button>
-                  ))}
-                </div>
-                <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-gray-50 to-transparent" />
-                <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
-                  →
-                </div>
-              </div>
-
-              <div className="relative">
-                <div className="flex gap-3 overflow-x-auto pb-2 pr-8 scrollbar-hide">
-                  {brands.map((brand) => {
-                    const isActive =
-                      normalizeText(selectedBrand) ===
-                      normalizeText(brand.name);
-                    const logoUrl = resolveLogoUrl(brand.logoUrl);
-                    const shortLabel = getShortLabel(brand.name);
-
-                    return (
-                      <button
-                        key={brand.id}
-                        type="button"
-                        onClick={() => handleBrandClick(brand.name)}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] ${
-                          isActive
-                            ? 'border-pink-500 text-pink-600 bg-pink-50'
-                            : 'border-gray-200 text-gray-700 bg-white'
-                        }`}
-                      >
-                        <div className="w-6 h-6 rounded-full overflow-hidden border border-gray-200 flex items-center justify-center text-[9px]">
-                          {logoUrl ? (
-                            <img
-                              src={logoUrl}
-                              alt={brand.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            shortLabel
-                          )}
-                        </div>
-                        <span className="truncate max-w-[90px]">
-                          {brand.name}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-gray-50 to-transparent" />
-                <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
-                  →
-                </div>
-              </div>
+          {/* Carrossel compacto no mobile */}
+          {isDefaultView && featuredProducts.length > 0 && (
+            <div className="md:hidden">
+              <FeaturedCarousel products={featuredProducts} compact />
             </div>
           )}
+
+          {/* Categorias compactas no mobile */}
+          <div className="md:hidden mb-4">
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={resetFilters}
+                className={`px-3 py-2 rounded-full border text-[11px] ${
+                  selectedCategory === 'all'
+                    ? 'bg-pink-600 text-white border-pink-600'
+                    : 'bg-white text-gray-600'
+                }`}
+              >
+                Todos
+              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => filterBy(cat.id)}
+                  className={`px-3 py-2 rounded-full border text-[11px] ${
+                    selectedCategory === cat.id
+                      ? 'bg-pink-600 text-white border-pink-600'
+                      : 'bg-white text-gray-600'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {isDefaultView ? (
             <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-6 mb-4 md:mb-8 transition-all duration-300">
@@ -773,7 +741,7 @@ export default function Home() {
           )}
           {/* CARROSSEL DESTAQUES */}
           {isDefaultView && featuredProducts.length > 0 && (
-            <div className="mb-6 md:mb-8" id="destaques">
+            <div className="mb-6 md:mb-8 hidden md:block" id="destaques">
               <div className="flex items-center justify-between mb-4 md:mb-6">
                 <div className="flex items-center gap-3">
                   <div className="h-8 w-1 bg-pink-600 rounded-full" />

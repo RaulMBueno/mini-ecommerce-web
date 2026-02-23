@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 
-export default function FeaturedCarousel({ products }) {
+export default function FeaturedCarousel({ products, compact = false }) {
   const [current, setCurrent] = useState(0);
 
   if (!products || products.length === 0) return null;
@@ -29,8 +29,12 @@ export default function FeaturedCarousel({ products }) {
 
   const goTo = (index) => setCurrent(index);
 
+  const containerClass = compact
+    ? 'relative w-full max-w-7xl mx-auto mb-4 overflow-hidden rounded-xl shadow-lg bg-white h-[160px] md:h-[420px]'
+    : 'relative w-full max-w-7xl mx-auto mb-6 md:mb-12 overflow-hidden rounded-2xl shadow-2xl bg-white h-[180px] md:h-[420px]';
+
   return (
-    <div className="relative w-full max-w-7xl mx-auto mb-6 md:mb-12 overflow-hidden rounded-2xl shadow-2xl bg-white h-[180px] md:h-[420px]">
+    <div className={containerClass}>
       <div className="w-full h-full relative">
         {/* =========================================================
            SLIDE 0 — HERO REMAKEUP (desktop + mobile)
