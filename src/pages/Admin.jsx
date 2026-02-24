@@ -167,7 +167,10 @@ export default function Admin() {
     try {
       const payload = {
         ...formData,
-        price: parseFloat(formData.price),
+        price:
+          formData.type === 'AFFILIATE' || formData.price === ''
+            ? null
+            : parseFloat(formData.price),
         homePriority:
           formData.homePriority === '' || formData.homePriority === null
             ? 0
@@ -293,8 +296,13 @@ export default function Admin() {
                   onChange={handleChange}
                   step="0.01"
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
-                  required
+                required={formData.type !== 'AFFILIATE'}
                 />
+              {formData.type === 'AFFILIATE' && (
+                <p className="text-xs text-gray-400 mt-1">
+                  Para afiliado, o preço será mostrado no parceiro.
+                </p>
+              )}
               </div>
 
               <div>
