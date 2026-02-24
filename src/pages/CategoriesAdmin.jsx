@@ -3,11 +3,14 @@ import { Link } from 'react-router-dom';
 // import axios from 'axios'; // REMOVIDO
 import api from '../api'; // <--- USANDO API INTELIGENTE
 import PageMeta from '../components/PageMeta';
-import { ArrowLeft, Plus, Trash2, Tag } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Tag, Pencil, Check, X } from 'lucide-react';
 
 export default function CategoriesAdmin() {
   const [categories, setCategories] = useState([]);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [editingId, setEditingId] = useState(null);
+  const [editingName, setEditingName] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     loadCategories();
@@ -48,6 +51,40 @@ export default function CategoriesAdmin() {
       loadCategories();
     } catch (error) {
       alert("Erro ao excluir. Talvez existam produtos vinculados a esta categoria.");
+    }
+  };
+
+  const startEdit = (category) => {
+    setEditingId(category.id);
+    setEditingName(category.name);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditingName('');
+  };
+
+  const saveEdit = async (id) => {
+    const name = editingName.trim();
+    if (!name) {
+      alert('Nome inválido');
+      return;
+    }
+
+    try {
+      setSavingEdit(true);
+      await api.put(`/categories/${id}`, { name });
+      await loadCategories();
+      setEditingId(null);
+      setEditingName('');
+    } catch (error) {
+      if (error?.response?.status === 409) {
+        alert('Já existe uma categoria com esse nome.');
+      } else {
+        alert('Erro ao atualizar categoria. Você está logado?');
+      }
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -97,20 +134,63 @@ export default function CategoriesAdmin() {
           <div className="space-y-3">
             {categories.map((cat) => (
               <div key={cat.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-pink-200 transition">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-1">
                   <div className="p-2 bg-white rounded-full text-pink-500 shadow-sm">
                     <Tag size={16} />
                   </div>
-                  <span className="font-medium text-gray-800">{cat.name}</span>
+                  {cat.id === editingId ? (
+                    <input
+                      value={editingName}
+                      onChange={(e) => setEditingName(e.target.value)}
+                      className="font-medium text-gray-800 bg-white border rounded px-3 py-2 w-full max-w-xs focus:ring-2 focus:ring-pink-500 outline-none"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveEdit(cat.id);
+                        if (e.key === 'Escape') cancelEdit();
+                      }}
+                    />
+                  ) : (
+                    <span className="font-medium text-gray-800">{cat.name}</span>
+                  )}
                 </div>
-                
-                <button 
-                  onClick={() => handleDelete(cat.id)}
-                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition"
-                  title="Excluir Categoria"
-                >
-                  <Trash2 size={18} />
-                </button>
+
+                {cat.id === editingId ? (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => saveEdit(cat.id)}
+                      disabled={savingEdit}
+                      className="p-2 text-green-600 hover:bg-green-50 rounded-full transition disabled:opacity-50"
+                      title="Salvar"
+                    >
+                      <Check size={18} />
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      disabled={savingEdit}
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition disabled:opacity-50"
+                      title="Cancelar"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => startEdit(cat)}
+                      className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition"
+                      title="Renomear"
+                    >
+                      <Pencil size={18} />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(cat.id)}
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition"
+                      title="Excluir Categoria"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
             
