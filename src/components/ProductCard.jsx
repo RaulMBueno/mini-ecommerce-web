@@ -8,7 +8,8 @@ export default function ProductCard({ product }) {
       ? product.categories[0].name
       : 'Geral';
 
-  const isAffiliate = !!product.affiliateUrl;
+  const isAffiliate = product?.type === 'AFFILIATE';
+  const affiliateUrl = product?.affiliateUrl;
 
   return (
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full border border-gray-100 group">
@@ -87,38 +88,27 @@ export default function ProductCard({ product }) {
           {product.description}
         </p>
 
-        {/* Aviso de afiliado */}
-        {isAffiliate && (
-          <p className="text-[10px] text-gray-400 italic mb-3 flex items-center gap-1 bg-gray-50 p-1.5 rounded w-fit">
-            ⚠️ Preço no parceiro pode variar
-          </p>
-        )}
-
         {/* Rodapé: preço + botão */}
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50 gap-2">
-          {isAffiliate ? (
-            <span className="text-xs text-gray-500">
-              Ver preço no parceiro
-            </span>
-          ) : (
+          {!isAffiliate && (
             <span className="text-lg sm:text-xl font-bold text-pink-600">
               R$ {product.price?.toFixed(2)}
             </span>
           )}
 
           {isAffiliate ? (
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col items-stretch gap-2 w-full">
               <a
-                href={product.affiliateUrl}
+                href={affiliateUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 sm:gap-2 bg-pink-50 text-pink-600 px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-xl hover:bg-pink-600 hover:text-white transition font-bold text-[11px] sm:text-sm"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 bg-pink-50 text-pink-600 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl hover:bg-pink-600 hover:text-white transition font-bold text-[11px] sm:text-sm w-full"
               >
                 Ver preço no parceiro <ExternalLink size={14} />
               </a>
               <Link
                 to={`/product/${product.id}`}
-                className="text-[11px] sm:text-xs text-gray-600 hover:text-pink-600 underline"
+                className="text-[11px] sm:text-xs text-gray-600 hover:text-pink-600 underline text-center"
               >
                 Ver detalhes
               </Link>

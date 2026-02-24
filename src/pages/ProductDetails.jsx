@@ -28,6 +28,8 @@ export default function ProductDetails() {
   const metaDescription = product?.description
     ? product.description
     : 'Detalhes do produto na ReMakeup Store.';
+  const isAffiliate = product?.type === 'AFFILIATE';
+  const affiliateUrl = product?.affiliateUrl;
 
   if (loading) {
     return (
@@ -88,23 +90,35 @@ export default function ProductDetails() {
             </p>
 
             <div className="border-t border-gray-200 pt-8 mt-auto">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <span className="text-3xl font-bold text-pink-600">
-                    R$ {product.price?.toFixed(2)}
-                  </span>
-                  {product.affiliateUrl && (
-                    <p className="text-xs text-gray-400 mt-1 italic">
-                      ⚠️ Preço sujeito a alteração no site parceiro
-                    </p>
-                  )}
+              {!isAffiliate && (
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <span className="text-3xl font-bold text-pink-600">
+                      R$ {product.price?.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Botão de Ação */}
-              {product.affiliateUrl ? (
+              {isAffiliate ? (
                 <a
-                  href={product.affiliateUrl}
+                  href={affiliateUrl || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-disabled={!affiliateUrl}
+                  className={`w-full bg-pink-600 text-white font-bold text-lg py-4 rounded-xl transition flex items-center justify-center gap-3 shadow-lg hover:shadow-pink-500/30 ${
+                    affiliateUrl
+                      ? 'hover:bg-pink-700'
+                      : 'opacity-60 pointer-events-none'
+                  }`}
+                >
+                  Ver preço no parceiro
+                  <ExternalLink className="h-6 w-6" />
+                </a>
+              ) : affiliateUrl ? (
+                <a
+                  href={affiliateUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-pink-600 text-white font-bold text-lg py-4 rounded-xl hover:bg-pink-700 transition flex items-center justify-center gap-3 shadow-lg hover:shadow-pink-500/30"
@@ -117,6 +131,9 @@ export default function ProductDetails() {
                   Adicionar ao Carrinho
                   <ShoppingCart className="h-6 w-6" />
                 </button>
+              )}
+              {isAffiliate && !affiliateUrl && (
+                <p className="text-xs text-gray-400 mt-2">Link indisponível</p>
               )}
             </div>
           </div>

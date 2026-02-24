@@ -88,6 +88,8 @@ export default function FeaturedCarousel({ products, compact = false }) {
         ========================================================== */}
         {products.map((product, index) => {
           const slideIndex = index + 1; // 0 é o hero
+          const isAffiliate = product?.type === 'AFFILIATE';
+          const affiliateUrl = product?.affiliateUrl;
 
           return (
             <div
@@ -118,15 +120,20 @@ export default function FeaturedCarousel({ products, compact = false }) {
                 </p>
 
                 <div className="flex items-center gap-4 mt-auto">
-                  {product.affiliateUrl ? (
+                  {isAffiliate ? (
                     <div className="flex items-center gap-3">
                       <a
-                        href={product.affiliateUrl}
+                        href={affiliateUrl || '#'}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-8 py-3 bg-pink-600 text-white font-bold rounded-full hover:bg-pink-700 transition flex items-center gap-2 shadow-lg text-base"
+                        aria-disabled={!affiliateUrl}
+                        className={`px-8 py-3 bg-pink-600 text-white font-bold rounded-full transition flex items-center gap-2 shadow-lg text-base ${
+                          affiliateUrl
+                            ? 'hover:bg-pink-700'
+                            : 'opacity-60 pointer-events-none'
+                        }`}
                       >
-                        Ver Oferta <ExternalLink size={18} />
+                        Ver preço no parceiro <ExternalLink size={18} />
                       </a>
                       <Link
                         to={`/product/${product.id}`}
@@ -136,26 +143,28 @@ export default function FeaturedCarousel({ products, compact = false }) {
                       </Link>
                     </div>
                   ) : (
-                    <Link
-                      to={`/product/${product.id}`}
-                      className="px-8 py-3 bg-gray-900 text-white font-bold rounded-full hover:bg-black transition shadow-lg text-base"
-                    >
-                      Comprar Agora
-                    </Link>
+                    <>
+                      <Link
+                        to={`/product/${product.id}`}
+                        className="px-8 py-3 bg-gray-900 text-white font-bold rounded-full hover:bg-black transition shadow-lg text-base"
+                      >
+                        Comprar Agora
+                      </Link>
+                      <span className="text-2xl font-bold text-pink-600">
+                        R$ {product.price?.toFixed(2)}
+                      </span>
+                    </>
                   )}
-
-                  <span className="text-2xl font-bold text-pink-600">
-                    R$ {product.price?.toFixed(2)}
-                  </span>
                 </div>
               </div>
 
               {/* IMAGEM + OVERLAY — MOBILE (e lado direito no desktop) */}
-              {product.affiliateUrl ? (
+              {isAffiliate ? (
                 <a
-                  href={product.affiliateUrl}
+                  href={affiliateUrl || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-disabled={!affiliateUrl}
                   className="w-full md:w-1/2 h-full relative block"
                 >
                   <img
@@ -169,13 +178,13 @@ export default function FeaturedCarousel({ products, compact = false }) {
                     Destaque do dia
                   </div>
 
-                  {/* nome + preço sobre a imagem no mobile */}
+                  {/* nome + CTA sobre a imagem no mobile */}
                   <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent md:hidden">
                     <div className="text-sm font-semibold text-white truncate">
                       {product.name}
                     </div>
                     <div className="text-xs text-pink-100 font-bold">
-                      R$ {product.price?.toFixed(2)}
+                      Ver preço no parceiro
                     </div>
                   </div>
                 </a>
