@@ -36,6 +36,7 @@ export default function Admin() {
     categoryId: '',
     brand: '',
     isFeatured: false,
+    homePriority: 0,
   });
 
   useEffect(() => {
@@ -120,6 +121,7 @@ export default function Admin() {
       categoryId: firstCatId,
       brand: product.brand || '',
       isFeatured: product.isFeatured || false,
+      homePriority: product.homePriority ?? 0,
     });
     setEditingId(product.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -137,6 +139,7 @@ export default function Admin() {
       categoryId: '',
       brand: '',
       isFeatured: false,
+      homePriority: 0,
     });
   };
 
@@ -165,6 +168,10 @@ export default function Admin() {
       const payload = {
         ...formData,
         price: parseFloat(formData.price),
+        homePriority:
+          formData.homePriority === '' || formData.homePriority === null
+            ? 0
+            : parseInt(formData.homePriority, 10),
         categories: formData.categoryId
           ? [{ id: parseInt(formData.categoryId, 10) }]
           : [],
@@ -362,6 +369,24 @@ export default function Admin() {
                 onChange={handleChange}
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Prioridade na Home (0–999)
+              </label>
+              <input
+                type="number"
+                name="homePriority"
+                value={formData.homePriority}
+                onChange={handleChange}
+                min="0"
+                max="999"
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Maior prioridade = aparece antes na vitrine. Use 0 para padrão.
+              </p>
             </div>
 
             <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
