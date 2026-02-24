@@ -1,76 +1,35 @@
-import React, { useState } from 'react';
-import api from '../api'; // <--- Usamos o nosso cliente inteligente
+import React from 'react';
 import PageMeta from '../components/PageMeta';
-import { useNavigate } from 'react-router-dom';
+import getApiBaseUrl from '../utils/getApiBaseUrl';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      // CORREÇÃO AQUI: Usamos 'api.post' e removemos o localhost
-      const response = await api.post('/auth/login', {
-        email: email,
-        password: password
-      });
-
-      // Se deu certo, pega o Token
-      const token = response.data.token;
-      
-      // Guarda o Token no navegador
-      localStorage.setItem('miniecommerce_token', token);
-
-      alert("Login realizado com sucesso!");
-      navigate('/admin');
-
-    } catch (error) {
-      alert("Erro no login! Verifique email e senha.");
-      console.error(error);
-    }
+  const handleGoogleLogin = () => {
+    window.location.href = `${getApiBaseUrl()}/oauth2/authorization/google`;
   };
 
   return (
     <>
       <PageMeta
-        title="Login | ReMakeup Store"
-        description="Acesso ao painel administrativo da ReMakeup Store."
+        title="Login Administrativo | ReMakeup Store"
+        description="Login administrativo via Google para a ReMakeup Store."
         noIndex
       />
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center text-pink-600 mb-6">Acesso Restrito</h1>
-        
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-gray-700 mb-1">Email</label>
-            <input 
-              type="email" 
-              className="w-full p-2 border rounded focus:ring-2 focus:ring-pink-500 outline-none"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="admin@exemplo.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 mb-1">Senha</label>
-            <input 
-              type="password" 
-              className="w-full p-2 border rounded focus:ring-2 focus:ring-pink-500 outline-none"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="******"
-            />
-          </div>
-
-          <button type="submit" className="w-full bg-pink-600 text-white py-2 rounded hover:bg-pink-700 transition font-bold">
-            ENTRAR
+        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
+          <h1 className="text-2xl font-bold text-pink-600 mb-3">
+            Login Administrativo
+          </h1>
+          <p className="text-sm text-gray-600 mb-6">
+            Acesso restrito para administração da loja.
+          </p>
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="w-full bg-pink-600 text-white py-2.5 rounded-full hover:bg-pink-700 transition font-bold"
+          >
+            Entrar com Google
           </button>
-        </form>
-      </div>
+        </div>
       </div>
     </>
   );
