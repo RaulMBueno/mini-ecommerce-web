@@ -8,6 +8,7 @@ export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   useEffect(() => {
     api
@@ -22,6 +23,10 @@ export default function ProductDetails() {
       });
   }, [id]);
 
+  useEffect(() => {
+    setIsDescriptionExpanded(false);
+  }, [id]);
+
   const metaTitle = product
     ? `${product.name} | ReMakeup Store`
     : 'Produto | ReMakeup Store';
@@ -30,6 +35,8 @@ export default function ProductDetails() {
     : 'Detalhes do produto na ReMakeup Store.';
   const isAffiliate = product?.type === 'AFFILIATE';
   const affiliateUrl = product?.affiliateUrl;
+  const descriptionText = product?.description || '';
+  const isLongDescription = descriptionText.trim().length > 240;
 
   if (loading) {
     return (
@@ -52,14 +59,22 @@ export default function ProductDetails() {
       <PageMeta title={metaTitle} description={metaDescription} />
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Botão Voltar */}
-        <Link
-          to="/"
-          className="inline-flex items-center text-gray-600 hover:text-pink-600 mb-8 transition"
-        >
-          <ArrowLeft className="mr-2 h-5 w-5" />
-          Voltar para Loja
-        </Link>
+        {/* Botões de navegação */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-pink-600 font-semibold hover:text-pink-700 transition"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            Voltar para a página principal
+          </Link>
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center gap-2 bg-white text-pink-600 border border-pink-200 px-4 py-2 rounded-lg hover:bg-pink-50 transition text-sm font-semibold shadow-sm"
+          >
+            Ver mais ofertas
+          </Link>
+        </div>
 
         {/* CARD PRINCIPAL */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row md:items-start">
@@ -85,9 +100,29 @@ export default function ProductDetails() {
               {product.name}
             </h1>
 
-            <p className="text-gray-600 text-lg mb-8 leading-relaxed">
-              {product.description}
-            </p>
+            <div className="mb-8">
+              <p
+                className={`text-gray-600 text-lg leading-relaxed whitespace-pre-line ${
+                  !isDescriptionExpanded && isLongDescription
+                    ? 'line-clamp-6 max-h-[10.5rem] overflow-hidden'
+                    : ''
+                }`}
+              >
+                {descriptionText}
+              </p>
+              {isLongDescription && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setIsDescriptionExpanded((prev) => !prev)
+                  }
+                  className="mt-2 text-sm font-semibold text-pink-600 hover:text-pink-700 underline"
+                  aria-expanded={isDescriptionExpanded}
+                >
+                  {isDescriptionExpanded ? 'Ver menos' : 'Ver mais'}
+                </button>
+              )}
+            </div>
 
             <div className="border-t border-gray-200 pt-8 mt-auto">
               {!isAffiliate && (
@@ -107,7 +142,7 @@ export default function ProductDetails() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-disabled={!affiliateUrl}
-                  className={`w-full bg-pink-600 text-white font-bold text-lg py-4 rounded-xl transition flex items-center justify-center gap-3 shadow-lg hover:shadow-pink-500/30 ${
+                  className={`w-full bg-pink-600 text-white font-bold text-lg sm:text-xl py-4 sm:py-5 rounded-xl transition flex items-center justify-center gap-3 shadow-xl hover:shadow-pink-500/40 ${
                     affiliateUrl
                       ? 'hover:bg-pink-700'
                       : 'opacity-60 pointer-events-none'
@@ -121,7 +156,7 @@ export default function ProductDetails() {
                   href={affiliateUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full bg-pink-600 text-white font-bold text-lg py-4 rounded-xl hover:bg-pink-700 transition flex items-center justify-center gap-3 shadow-lg hover:shadow-pink-500/30"
+                  className="w-full bg-pink-600 text-white font-bold text-lg sm:text-xl py-4 sm:py-5 rounded-xl hover:bg-pink-700 transition flex items-center justify-center gap-3 shadow-xl hover:shadow-pink-500/40"
                 >
                   Ver Oferta na Loja
                   <ExternalLink className="h-6 w-6" />
