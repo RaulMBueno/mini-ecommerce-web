@@ -80,14 +80,33 @@ export default function ProductDetails() {
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row md:items-start">
           {/* Lado Esquerdo: Imagem */}
           <div className="md:w-1/2 bg-gray-100 p-8 flex justify-center items-start">
-            <img
-              src={
-                product.imgUrl ||
-                'https://via.placeholder.com/600x600?text=Sem+Imagem'
-              }
-              alt={product.name}
-              className="max-h-[500px] w-full object-contain rounded-lg hover:scale-105 transition duration-500"
-            />
+            {isAffiliate && affiliateUrl ? (
+              <a
+                href={affiliateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full"
+                title="Ir para o site parceiro"
+              >
+                <img
+                  src={
+                    product.imgUrl ||
+                    'https://via.placeholder.com/600x600?text=Sem+Imagem'
+                  }
+                  alt={product.name}
+                  className="max-h-[500px] w-full object-contain rounded-lg hover:scale-105 transition duration-500"
+                />
+              </a>
+            ) : (
+              <img
+                src={
+                  product.imgUrl ||
+                  'https://via.placeholder.com/600x600?text=Sem+Imagem'
+                }
+                alt={product.name}
+                className="max-h-[500px] w-full object-contain rounded-lg hover:scale-105 transition duration-500"
+              />
+            )}
           </div>
 
           {/* Lado Direito: Informações */}
@@ -96,9 +115,23 @@ export default function ProductDetails() {
               {product.type === 'AFFILIATE' ? 'Parceiro' : 'Exclusivo'}
             </span>
 
-            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 leading-tight">
-              {product.name}
-            </h1>
+            {isAffiliate && affiliateUrl ? (
+              <a
+                href={affiliateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Ir para o site parceiro"
+                className="hover:text-pink-600 transition"
+              >
+                <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 leading-tight">
+                  {product.name}
+                </h1>
+              </a>
+            ) : (
+              <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 leading-tight">
+                {product.name}
+              </h1>
+            )}
 
             <div className="mb-8">
               <p
