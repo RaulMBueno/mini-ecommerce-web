@@ -59,14 +59,20 @@ export default function ProductDetails() {
       <PageMeta title={metaTitle} description={metaDescription} />
       <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Link voltar */}
-        <div className="mb-4">
+        {/* Links superiores */}
+        <div className="mb-4 flex items-center justify-between gap-3">
           <Link
             to="/"
             className="inline-flex items-center gap-2 text-pink-600 text-sm font-semibold hover:text-pink-700 transition"
           >
             <ArrowLeft className="h-4 w-4" />
             Voltar para a página principal
+          </Link>
+          <Link
+            to="/"
+            className="text-sm font-semibold text-pink-600 hover:text-pink-700 transition"
+          >
+            Ver mais ofertas
           </Link>
         </div>
 
@@ -76,9 +82,9 @@ export default function ProductDetails() {
             <img
               src="/hero-banner.jpg"
               alt="ReMakeup Store"
-              className="w-full h-36 sm:h-44 md:h-56 object-cover"
+              className="w-full h-36 sm:h-44 md:h-56 object-cover object-top"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/55 to-transparent" />
             <div className="absolute top-3 left-3 flex items-center gap-2 sm:top-4 sm:left-4">
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-pink-600 text-white font-extrabold flex items-center justify-center shadow-sm">
                 R
@@ -86,6 +92,17 @@ export default function ProductDetails() {
               <span className="text-xl sm:text-2xl font-extrabold text-gray-900">
                 ReMakeup.
               </span>
+            </div>
+            <div className="absolute inset-0 flex flex-col items-start justify-center px-4 sm:px-6">
+              <div className="max-w-md">
+                <h2 className="text-lg sm:text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight mb-1">
+                  Realce sua beleza única
+                </h2>
+                <p className="text-[11px] sm:text-sm text-gray-700">
+                  Achadinhos da Re — Maquiagem &amp; Beleza oficiais para comprar
+                  direto nas lojas parceiras
+                </p>
+              </div>
             </div>
           </div>
         </div>
