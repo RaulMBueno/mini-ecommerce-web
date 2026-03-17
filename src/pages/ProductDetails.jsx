@@ -82,7 +82,7 @@ export default function ProductDetails() {
             <img
               src="/hero-banner.jpg"
               alt="ReMakeup Store"
-              className="w-full h-36 sm:h-44 md:h-56 object-cover object-top"
+              className="w-full h-36 sm:h-44 md:h-56 object-cover object-[50%_20%]"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/55 to-transparent" />
             <div className="absolute top-3 left-3 flex items-center gap-2 sm:top-4 sm:left-4">
