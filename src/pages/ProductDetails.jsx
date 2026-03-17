@@ -59,48 +59,41 @@ export default function ProductDetails() {
       <PageMeta title={metaTitle} description={metaDescription} />
       <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Cabeçalho com identidade */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-lg bg-pink-600 text-white font-extrabold flex items-center justify-center shadow-sm">
-            R
-          </div>
-          <span className="text-2xl font-extrabold text-gray-900">
-            ReMakeup.
-          </span>
+        {/* Link voltar */}
+        <div className="mb-4">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-pink-600 text-sm font-semibold hover:text-pink-700 transition"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar para a página principal
+          </Link>
         </div>
 
-        {/* Banner estático */}
-        <div className="mb-6">
-          <div className="w-full overflow-hidden rounded-2xl shadow-md bg-white">
+        {/* Banner estático com identidade */}
+        <div className="mb-8">
+          <div className="relative w-full overflow-hidden rounded-2xl shadow-md bg-white">
             <img
               src="/hero-banner.jpg"
               alt="ReMakeup Store"
-              className="w-full h-32 sm:h-40 md:h-48 object-cover"
+              className="w-full h-36 sm:h-44 md:h-56 object-cover"
             />
+            <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent" />
+            <div className="absolute top-3 left-3 flex items-center gap-2 sm:top-4 sm:left-4">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-pink-600 text-white font-extrabold flex items-center justify-center shadow-sm">
+                R
+              </div>
+              <span className="text-xl sm:text-2xl font-extrabold text-gray-900">
+                ReMakeup.
+              </span>
+            </div>
           </div>
-        </div>
-
-        {/* Botões de navegação */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-pink-600 font-semibold hover:text-pink-700 transition"
-          >
-            <ArrowLeft className="h-5 w-5" />
-            Voltar para a página principal
-          </Link>
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center gap-2 bg-white text-pink-600 border border-pink-200 px-4 py-2 rounded-lg hover:bg-pink-50 transition text-sm font-semibold shadow-sm"
-          >
-            Ver mais ofertas
-          </Link>
         </div>
 
         {/* CARD PRINCIPAL */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row md:items-stretch">
           {/* Lado Esquerdo: Imagem */}
-          <div className="md:w-1/2 bg-gray-50 p-4 sm:p-6 md:p-8 flex justify-center items-center">
+          <div className="md:w-1/2 bg-gray-50 p-4 sm:p-6 md:p-8 flex justify-start items-start">
             {isAffiliate && affiliateUrl ? (
               <a
                 href={affiliateUrl}
@@ -115,7 +108,7 @@ export default function ProductDetails() {
                     'https://via.placeholder.com/600x600?text=Sem+Imagem'
                   }
                   alt={product.name}
-                  className="max-h-[320px] sm:max-h-[380px] md:max-h-[500px] w-full object-contain rounded-xl hover:scale-105 transition duration-500"
+                  className="max-h-[260px] sm:max-h-[320px] md:max-h-[420px] w-full object-contain rounded-xl bg-white shadow-sm p-3 sm:p-4"
                 />
               </a>
             ) : (
@@ -125,7 +118,7 @@ export default function ProductDetails() {
                   'https://via.placeholder.com/600x600?text=Sem+Imagem'
                 }
                 alt={product.name}
-                className="max-h-[320px] sm:max-h-[380px] md:max-h-[500px] w-full object-contain rounded-xl hover:scale-105 transition duration-500"
+                className="max-h-[260px] sm:max-h-[320px] md:max-h-[420px] w-full object-contain rounded-xl bg-white shadow-sm p-3 sm:p-4"
               />
             )}
           </div>
@@ -179,7 +172,7 @@ export default function ProductDetails() {
             </div>
 
             {/* CTA principal */}
-            <div className="mt-4">
+            <div className="mt-2">
               {isAffiliate ? (
                 <a
                   href={affiliateUrl || '#'}
