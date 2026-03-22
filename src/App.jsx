@@ -7,6 +7,8 @@ import ProductDetails from './pages/ProductDetails';
 import CategoriesAdmin from './pages/CategoriesAdmin';
 import BrandsAdmin from './pages/BrandsAdmin';
 import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
+import Courses from './pages/Courses';
+import CourseComingSoon from './pages/CourseComingSoon';
 
 const TOKEN_STORAGE_KEY = 'miniecommerce_token';
 
@@ -24,6 +26,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/categoria/:id" element={<Home />} />
+        <Route path="/cursos" element={<Courses />} />
+        <Route path="/cursos/:slug" element={<CourseComingSoon />} />
         <Route
           path="/admin"
           element={

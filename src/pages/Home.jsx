@@ -572,6 +572,14 @@ export default function Home() {
               </div>
             </div>
 
+            <Link
+              to="/cursos"
+              onClick={() => setIsMenuOpen(false)}
+              className="mt-3 block w-full text-center py-2.5 rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 text-pink-700 text-xs font-bold border border-pink-200/60"
+            >
+              Cursos em breve — ver vitrine
+            </Link>
+
             {/* Marcas */}
             <div className="mt-4">
               <h3 className="text-xs font-semibold uppercase text-gray-500 mb-2">
@@ -666,17 +674,12 @@ export default function Home() {
               <p className="text-gray-600 text-xs mb-3">
                 Confira nossos cursos de automaquiagem.
               </p>
-              <button
-                onClick={() => {
-                  const cursoCat = categories.find((c) =>
-                    c.name.includes('Curso')
-                  );
-                  if (cursoCat) filterBy(cursoCat.id);
-                }}
-                className="text-xs font-bold text-pink-600 hover:underline"
+              <Link
+                to="/cursos"
+                className="inline-block text-xs font-bold text-pink-600 hover:underline"
               >
                 Ver Cursos &rarr;
-              </button>
+              </Link>
             </div>
           </div>
         </aside>
