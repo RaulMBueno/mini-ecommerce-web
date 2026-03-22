@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api';
+import { slugify } from '../utils/slugify';
 import PageMeta from '../components/PageMeta';
 import { ShoppingCart, ExternalLink, ArrowLeft, Loader } from 'lucide-react';
 
 export default function ProductDetails() {
-  const { id } = useParams();
+  const { id, slug } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -22,6 +24,15 @@ export default function ProductDetails() {
         setLoading(false);
       });
   }, [id]);
+
+  // Atualiza a URL para o slug canônico (SEO) sem refetch; slug da URL não afeta a API.
+  useEffect(() => {
+    if (!product?.name || String(product.id) !== String(id)) return;
+    const expected = slugify(product.name);
+    if (slug !== expected) {
+      navigate(`/product/${id}/${expected}`, { replace: true });
+    }
+  }, [product, id, slug, navigate]);
 
   useEffect(() => {
     setIsDescriptionExpanded(false);

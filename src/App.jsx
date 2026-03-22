@@ -35,6 +35,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/admin/categories" element={<CategoriesAdmin />} />
         <Route path="/admin/brands" element={<BrandsAdmin />} />
+        <Route path="/product/:id/:slug" element={<ProductDetails />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
       </Routes>

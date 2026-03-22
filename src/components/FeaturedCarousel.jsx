@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { productPath } from '../utils/slugify';
 
 export default function FeaturedCarousel({ products, compact = false }) {
   const [current, setCurrent] = useState(0);
@@ -136,7 +137,7 @@ export default function FeaturedCarousel({ products, compact = false }) {
                         Ver preço no parceiro <ExternalLink size={18} />
                       </a>
                       <Link
-                        to={`/product/${product.id}`}
+                        to={productPath(product)}
                         className="text-sm text-gray-600 hover:text-pink-600 underline"
                       >
                         Ver detalhes
@@ -145,7 +146,7 @@ export default function FeaturedCarousel({ products, compact = false }) {
                   ) : (
                     <>
                       <Link
-                        to={`/product/${product.id}`}
+                        to={productPath(product)}
                         className="px-8 py-3 bg-gray-900 text-white font-bold rounded-full hover:bg-black transition shadow-lg text-base"
                       >
                         Comprar Agora
@@ -190,7 +191,7 @@ export default function FeaturedCarousel({ products, compact = false }) {
                 </a>
               ) : (
                 <Link
-                  to={`/product/${product.id}`}
+                  to={productPath(product)}
                   className="w-full md:w-1/2 h-full relative block"
                 >
                   <img

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, ExternalLink } from 'lucide-react';
+import { productPath } from '../utils/slugify';
 
 export default function ProductCard({ product }) {
   const primaryCategory =
@@ -33,7 +34,7 @@ export default function ProductCard({ product }) {
             />
           </a>
         ) : (
-          <Link to={`/product/${product.id}`} title="Clique para ver detalhes">
+          <Link to={productPath(product)} title="Clique para ver detalhes">
             <img
               className="w-full h-40 sm:h-48 md:h-56 object-cover cursor-pointer group-hover:scale-110 transition duration-700"
               src={
@@ -75,7 +76,7 @@ export default function ProductCard({ product }) {
           </a>
         ) : (
           <Link
-            to={`/product/${product.id}`}
+            to={productPath(product)}
             className="text-sm sm:text-base md:text-lg font-bold text-gray-900 mb-1.5 leading-tight group-hover:text-pink-600 transition line-clamp-2"
             title="Clique para ver detalhes"
           >
@@ -107,7 +108,7 @@ export default function ProductCard({ product }) {
                 Ver preço no parceiro <ExternalLink size={14} />
               </a>
               <Link
-                to={`/product/${product.id}`}
+                to={productPath(product)}
                 className="text-[11px] sm:text-xs text-gray-600 hover:text-pink-600 underline text-center"
               >
                 Ver detalhes
