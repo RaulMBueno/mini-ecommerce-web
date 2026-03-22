@@ -1,11 +1,14 @@
 // ReMakeup — vitrine de cursos em pré-lançamento (/cursos)
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles, Bell } from 'lucide-react';
 import PageMeta from '../components/PageMeta';
+import InterestSignupModal from '../components/InterestSignupModal';
 import { UPCOMING_COURSES } from '../data/upcomingCourses';
 
 export default function Courses() {
+  const [interestOpen, setInterestOpen] = useState(false);
+
   return (
     <>
       <PageMeta
@@ -83,12 +86,30 @@ export default function Courses() {
             ))}
           </div>
 
-          <p className="text-center text-xs text-gray-400 mt-10 max-w-md mx-auto">
-            Conteúdos em produção. Em breve você poderá se cadastrar para ser
-            avisada sobre abertura e condições especiais.
-          </p>
+          <div className="mt-10 flex flex-col items-center gap-3 max-w-md mx-auto">
+            <p className="text-center text-xs text-gray-400">
+              Conteúdos em produção. Cadastre-se para ser avisada sobre abertura e
+              condições especiais.
+            </p>
+            <button
+              type="button"
+              onClick={() => setInterestOpen(true)}
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border-2 border-pink-300 text-pink-700 font-bold text-sm hover:bg-pink-50 transition shadow-sm"
+            >
+              <Bell className="h-4 w-4" />
+              Quero ser avisada
+            </button>
+          </div>
         </main>
       </div>
+
+      <InterestSignupModal
+        isOpen={interestOpen}
+        onClose={() => setInterestOpen(false)}
+        interestType="COURSE"
+        interestReference="courses"
+        formTitle="Novidades sobre os cursos ReMakeup"
+      />
     </>
   );
 }

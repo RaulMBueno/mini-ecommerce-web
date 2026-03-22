@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { ArrowLeft, Bell, Sparkles } from 'lucide-react';
 import PageMeta from '../components/PageMeta';
+import InterestSignupModal from '../components/InterestSignupModal';
 import { getCourseBySlug } from '../data/upcomingCourses';
 
 export default function CourseComingSoon() {
   const { slug } = useParams();
   const course = getCourseBySlug(slug);
+  const [interestOpen, setInterestOpen] = useState(false);
 
   if (!course) {
     return <Navigate to="/cursos" replace />;
@@ -82,11 +84,7 @@ export default function CourseComingSoon() {
                 <button
                   type="button"
                   className="flex-1 inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-pink-600 text-white font-bold text-sm shadow-lg hover:bg-pink-700 transition ring-2 ring-pink-200/50"
-                  onClick={() =>
-                    alert(
-                      'Em breve você poderá se cadastrar aqui para receber avisos sobre este curso e novidades ReMakeup!'
-                    )
-                  }
+                  onClick={() => setInterestOpen(true)}
                 >
                   <Bell className="h-4 w-4" />
                   Quero ser avisada
@@ -113,6 +111,14 @@ export default function CourseComingSoon() {
               Voltar para cursos
             </Link>
           </div>
+
+          <InterestSignupModal
+            isOpen={interestOpen}
+            onClose={() => setInterestOpen(false)}
+            interestType="COURSE"
+            interestReference={course.slug}
+            formTitle={`Lista de interesse — ${course.title}`}
+          />
         </main>
       </div>
     </>
