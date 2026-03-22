@@ -1,3 +1,4 @@
+// ReMakeup — vitrine de cursos em pré-lançamento (/cursos)
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Sparkles } from 'lucide-react';
