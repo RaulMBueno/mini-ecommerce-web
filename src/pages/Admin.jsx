@@ -11,6 +11,7 @@ import {
   Star,
   Tag,
   Sparkles,
+  Bell,
 } from 'lucide-react';
 
 export default function Admin() {
@@ -232,6 +233,13 @@ export default function Admin() {
               className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition text-sm font-bold flex items-center justify-center gap-2 shadow-md"
             >
               <Sparkles size={16} /> Gerenciar Marcas
+            </Link>
+
+            <Link
+              to="/admin/interest-signups"
+              className="bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-800 transition text-sm font-bold flex items-center justify-center gap-2 shadow-md"
+            >
+              <Bell size={16} /> Pré-cadastros
             </Link>
           </div>
         </div>

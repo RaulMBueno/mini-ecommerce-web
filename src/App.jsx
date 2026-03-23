@@ -9,6 +9,7 @@ import BrandsAdmin from './pages/BrandsAdmin';
 import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
 import Courses from './pages/Courses';
 import CourseComingSoon from './pages/CourseComingSoon';
+import AdminInterestSignups from './pages/AdminInterestSignups';
 
 const TOKEN_STORAGE_KEY = 'miniecommerce_token';
 
@@ -39,6 +40,14 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/admin/categories" element={<CategoriesAdmin />} />
         <Route path="/admin/brands" element={<BrandsAdmin />} />
+        <Route
+          path="/admin/interest-signups"
+          element={
+            <AdminRoute>
+              <AdminInterestSignups />
+            </AdminRoute>
+          }
+        />
         <Route path="/product/:id/:slug" element={<ProductDetails />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
