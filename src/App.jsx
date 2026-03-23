@@ -10,11 +10,10 @@ import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
 import Courses from './pages/Courses';
 import CourseComingSoon from './pages/CourseComingSoon';
 import AdminInterestSignups from './pages/AdminInterestSignups';
-
-const TOKEN_STORAGE_KEY = 'miniecommerce_token';
+import { ADMIN_TOKEN_KEY } from './constants/authStorage';
 
 function AdminRoute({ children }) {
-  const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
   if (!token) {
     return <Navigate to="/login" replace />;
   }

@@ -14,6 +14,9 @@ import {
 } from 'lucide-react';
 
 import api from '../api';
+import customerApi from '../api/customerApi';
+import getApiBaseUrl from '../utils/getApiBaseUrl';
+import { ADMIN_TOKEN_KEY, CUSTOMER_TOKEN_KEY } from '../constants/authStorage';
 import FeaturedCarousel from '../components/FeaturedCarousel';
 import ProductCard from '../components/ProductCard';
 import PageMeta from '../components/PageMeta';
@@ -71,7 +74,8 @@ export default function Home() {
   const mainContentRef = useRef(null);
   const mobileSearchRef = useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [customerProfile, setCustomerProfile] = useState(null);
   const [isHighlightsOpen, setIsHighlightsOpen] = useState(true);
 
   const [allProducts, setAllProducts] = useState([]);
@@ -89,9 +93,22 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(0);
   const PRODUCTS_PER_PAGE = 12; // quantos produtos por página
 
+  const googleLoginUrl = `${getApiBaseUrl()}/oauth2/authorization/google`;
+
   useEffect(() => {
     fetchData();
-    checkLogin();
+    (async () => {
+      setIsAdminLoggedIn(!!localStorage.getItem(ADMIN_TOKEN_KEY));
+      if (localStorage.getItem(CUSTOMER_TOKEN_KEY)) {
+        try {
+          const { data } = await customerApi.get('/me');
+          setCustomerProfile(data);
+        } catch {
+          localStorage.removeItem(CUSTOMER_TOKEN_KEY);
+          setCustomerProfile(null);
+        }
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -110,16 +127,11 @@ export default function Home() {
     setCurrentPage(0);
   }, [categoryIdParam]);
 
-  // Verifica token no localStorage
-  const checkLogin = () => {
-    const token = localStorage.getItem('miniecommerce_token');
-    setIsLoggedIn(!!token);
-  };
-
-  // Logout
   const handleLogout = () => {
-    localStorage.removeItem('miniecommerce_token');
-    setIsLoggedIn(false);
+    localStorage.removeItem(ADMIN_TOKEN_KEY);
+    localStorage.removeItem(CUSTOMER_TOKEN_KEY);
+    setIsAdminLoggedIn(false);
+    setCustomerProfile(null);
     window.location.reload();
   };
 
@@ -378,14 +390,20 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Link Painel Admin só se logado */}
-              {isLoggedIn && (
+              {/* Painel admin só com JWT de admin */}
+              {isAdminLoggedIn && (
                 <Link
                   to="/admin"
                   className="text-gray-600 hover:text-pink-600 font-medium transition flex items-center gap-1"
                 >
                   <User size={18} /> Painel
                 </Link>
+              )}
+
+              {customerProfile && (
+                <span className="hidden sm:inline text-sm text-gray-600 max-w-[10rem] truncate" title={customerProfile.email}>
+                  Olá, {customerProfile.name || customerProfile.email?.split('@')[0] || 'visitante'}
+                </span>
               )}
 
               {/* Carrinho (placeholder) */}
@@ -396,9 +414,10 @@ export default function Home() {
                 </span>
               </button>
 
-              {/* Botão Login / Logout */}
-              {isLoggedIn ? (
+              {/* Google (loja) / sair */}
+              {isAdminLoggedIn || customerProfile ? (
                 <button
+                  type="button"
                   onClick={handleLogout}
                   className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-5 py-2 rounded-full hover:bg-gray-200 transition font-medium"
                 >
@@ -406,13 +425,22 @@ export default function Home() {
                   <span>Sair</span>
                 </button>
               ) : (
-                <Link
-                  to="/login"
-                  className="flex items-center space-x-2 bg-gray-900 text-white px-5 py-2 rounded-full hover:bg-gray-800 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                >
-                  <LogIn className="h-4 w-4" />
-                  <span>Entrar</span>
-                </Link>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={googleLoginUrl}
+                    className="flex items-center space-x-2 bg-gray-900 text-white px-5 py-2 rounded-full hover:bg-gray-800 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    <span className="hidden sm:inline">Entrar com Google</span>
+                    <span className="sm:hidden">Google</span>
+                  </a>
+                  <Link
+                    to="/login"
+                    className="text-xs text-gray-500 hover:text-pink-600 whitespace-nowrap"
+                  >
+                    Admin
+                  </Link>
+                </div>
               )}
             </div>
 
@@ -499,43 +527,59 @@ export default function Home() {
 
             {/* Login / Logout + Painel */}
             <div className="space-y-2">
-              {isLoggedIn ? (
-                <>
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 text-gray-800 text-sm"
+              {customerProfile && (
+                <p className="text-sm text-gray-700 px-1">
+                  Olá, {customerProfile.name || customerProfile.email?.split('@')[0] || 'visitante'}
+                </p>
+              )}
+              {isAdminLoggedIn && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 text-gray-800 text-sm"
+                >
+                  <span className="flex items-center gap-2">
+                    <User size={16} />
+                    Painel administrativo
+                  </span>
+                  <Link
+                    to="/admin"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-xs text-pink-600 underline"
                   >
-                    <span className="flex items-center gap-2">
-                      <User size={16} />
-                      Painel administrativo
-                    </span>
-                    <Link
-                      to="/admin"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="text-xs text-pink-600 underline"
-                    >
-                      Abrir
-                    </Link>
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white px-3 py-2 rounded-full text-sm"
-                  >
-                    <LogOut size={16} />
-                    <span>Sair</span>
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/login"
-                  onClick={() => setIsMenuOpen(false)}
+                    Abrir
+                  </Link>
+                </button>
+              )}
+              {isAdminLoggedIn || customerProfile ? (
+                <button
+                  type="button"
+                  onClick={handleLogout}
                   className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white px-3 py-2 rounded-full text-sm"
                 >
-                  <LogIn size={16} />
-                  <span>Entrar</span>
-                </Link>
+                  <LogOut size={16} />
+                  <span>Sair</span>
+                </button>
+              ) : (
+                <>
+                  <a
+                    href={googleLoginUrl}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white px-3 py-2 rounded-full text-sm"
+                  >
+                    <LogIn size={16} />
+                    <span>Entrar com Google</span>
+                  </a>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full text-center text-xs text-gray-500 hover:text-pink-600 py-1"
+                  >
+                    Login administrativo
+                  </Link>
+                </>
               )}
             </div>
 

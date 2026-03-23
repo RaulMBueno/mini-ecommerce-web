@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ADMIN_TOKEN_KEY } from './constants/authStorage';
 
 // Se estiver rodando com `npm run dev` (Vite), fala com o backend local.
 // Se for build de produção (Vercel), fala com o backend do Railway.
@@ -10,9 +11,9 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Anexa o token JWT em todas as requisições, se existir
+// JWT do painel admin (produtos, categorias, etc.)
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('miniecommerce_token');
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

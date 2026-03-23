@@ -1,26 +1,35 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import getApiBaseUrl from '../utils/getApiBaseUrl';
-
-const TOKEN_STORAGE_KEY = 'miniecommerce_token';
+import {
+  ADMIN_TOKEN_KEY,
+  CUSTOMER_TOKEN_KEY,
+} from '../constants/authStorage';
 
 export default function OAuth2RedirectHandler() {
   const navigate = useNavigate();
-  const { token, error } = useMemo(() => {
+  const { token, customerToken, error } = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return {
       token: params.get('token'),
+      customerToken: params.get('customerToken'),
       error: params.get('error'),
     };
   }, []);
 
   useEffect(() => {
+    if (customerToken) {
+      localStorage.setItem(CUSTOMER_TOKEN_KEY, customerToken);
+      window.history.replaceState({}, document.title, '/oauth2/redirect');
+      navigate('/', { replace: true });
+      return;
+    }
     if (token) {
-      localStorage.setItem(TOKEN_STORAGE_KEY, token);
+      localStorage.setItem(ADMIN_TOKEN_KEY, token);
       window.history.replaceState({}, document.title, '/oauth2/redirect');
       navigate('/admin', { replace: true });
     }
-  }, [token, navigate]);
+  }, [token, customerToken, navigate]);
 
   const googleLoginUrl = `${getApiBaseUrl()}/oauth2/authorization/google`;
 
@@ -28,22 +37,23 @@ export default function OAuth2RedirectHandler() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
         <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-lg max-w-md text-center">
-          <h1 className="text-xl font-bold mb-3">E-mail não autorizado</h1>
+          <h1 className="text-xl font-bold mb-3">Não foi possível concluir</h1>
           <p className="text-sm text-gray-600 mb-6">
-            Seu e-mail não está autorizado para acesso administrativo.
+            Não recebemos o e-mail da sua conta Google. Tente outra conta ou
+            verifique as permissões do app.
           </p>
           <Link
             to="/login"
             className="inline-flex items-center justify-center px-5 py-2 rounded-full bg-pink-600 text-white font-semibold hover:bg-pink-700 transition"
           >
-            Voltar ao login
+            Voltar ao login admin
           </Link>
         </div>
       </div>
     );
   }
 
-  if (!token) {
+  if (!token && !customerToken) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
         <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-lg max-w-md text-center">

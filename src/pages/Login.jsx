@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PageMeta from '../components/PageMeta';
 import getApiBaseUrl from '../utils/getApiBaseUrl';
 
@@ -29,6 +30,14 @@ export default function Login() {
           >
             Entrar com Google
           </button>
+          <p className="text-xs text-gray-500 mt-5 leading-relaxed">
+            É cliente? Na{' '}
+            <Link to="/" className="text-pink-600 hover:underline font-medium">
+              página inicial da loja
+            </Link>{' '}
+            use &quot;Entrar com Google&quot; — o mesmo login define se você é admin
+            (e-mail configurado) ou visitante.
+          </p>
         </div>
       </div>
     </>
